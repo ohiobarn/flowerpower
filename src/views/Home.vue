@@ -1,7 +1,8 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Flower Power" />
+
+    <img alt="flowerpower" width="400" height="400" src="../assets/seedling-solid.svg" />
+    <Splash msg="Welcome to Flower Power!" />
 
     <!-- Check that the SDK client is not currently loading before accessing is methods -->
     <div v-if="!$auth.loading">
@@ -10,17 +11,18 @@
       <!-- show logout when authenticated -->
       <button v-if="$auth.isAuthenticated" @click="logout">Log out</button>
     </div>
+    
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import Splash from '@/components/Splash.vue'
 
 export default {
   name: "home",
   components: {
-    HelloWorld
+    Splash
   },
   methods: {
     // Log the user in
