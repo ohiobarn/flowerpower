@@ -1,11 +1,9 @@
 <template>
   <div id="app">
     <div id="nav">
-        <router-link to="/">Home</router-link>
-      | <router-link to="/about">About</router-link>
-      <div v-if="$auth.isAuthenticated">
-        | <router-link  to="/profile">Profile</router-link>
-      </div>
+      <router-link to="/">Home</router-link> | 
+      <router-link to="/about">About</router-link>
+      <div v-if="$auth.isAuthenticated" style="display: inline"> | <router-link  to="/profile">Profile</router-link></div>
     </div>
     <router-view/>
   </div>
@@ -32,4 +30,7 @@
 #nav a.router-link-exact-active {
   color: #42b983;
 }
+
+
+
 </style>
