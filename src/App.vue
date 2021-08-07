@@ -1,27 +1,31 @@
 <template>
+
   <div class="cont">
-    <!-- 
 
-      NAV
-
-     -->
+    <!--  NAV -->
     <div class="row">
       <div class="col">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <nav class="navbar navbar-expand-sm navbar-light bg-light">
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto ">
+
+              <!--  Home -->
               <li class="nav-item">
                 <router-link class="nav-link" to="/">Home</router-link>
               </li>
+
+              <!--  Browse -->
               <li class="nav-item">
-                <router-link class="nav-link" to="/about">About</router-link>
+                <router-link class="nav-link" to="/browse">Browse</router-link>
+              </li>
+
+              <!--  Help -->
+              <li class="nav-item">
+                <router-link class="nav-link" to="/help">Help</router-link>
               </li>
             </ul>
-            <!-- 
 
-              User profile and login
-
-             -->
+            <!-- User Dropdown - User profile and login -->
             <div class="nav-item dropdown" v-if="!$auth.loading">
               <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 {{ $auth.user.name }}
@@ -42,18 +46,17 @@
       </div>
     </div>
 
-    <!--  
-
-      Page Content
-
-    -->
+    <!--  Page Content-->
     <div class="row">
       <div class="col-1"></div>
-      <div class="col align-self-center">
+      <div class="col">
         <router-view />
       </div>
+      <div class="col-1"></div>
     </div>
+
   </div>
+
 </template>
 
 <script>
