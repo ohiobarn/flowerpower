@@ -5,7 +5,9 @@ import Home from '../views/Home.vue'
 import Profile from "../views/Profile.vue";
 import Help from "../views/Help.vue";
 import Browse from "../views/Browse.vue"
-import AirtableTest from '../views/AirtableTest.vue';
+import OrderMgr from "../views/OrderMgr.vue"
+
+// import AirtableTest from '../views/AirtableTest.vue';
 
 Vue.use(VueRouter)
 
@@ -18,14 +20,15 @@ const routes = [
   {
     path: '/browse',
     name: 'Browse',
-    component: Browse
-  },
-  {
-    path: '/AirtableTest',
-    name: 'AirtableTest',
-    component: AirtableTest,
+    component: Browse,
     beforeEnter: authGuard
   },
+  // {
+  //   path: '/AirtableTest',
+  //   name: 'AirtableTest',
+  //   component: AirtableTest,
+  //   beforeEnter: authGuard
+  // },
   {
     path: '/help',
     name: 'Help',
@@ -37,6 +40,12 @@ const routes = [
     path: "/profile",
     name: "profile",
     component: Profile,
+    beforeEnter: authGuard
+  },
+  {
+    path: "/ordermgr",
+    name: "ordermgr",
+    component: OrderMgr,
     beforeEnter: authGuard
   }
   // {

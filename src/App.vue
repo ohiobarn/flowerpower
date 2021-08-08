@@ -14,9 +14,14 @@
                 <router-link class="nav-link" to="/">Home</router-link>
               </li>
 
-              <!--  Browse -->
-              <li class="nav-item">
-                <router-link class="nav-link" to="/browse">Browse</router-link>
+              <!--  Availability List -->
+              <li class="nav-item" v-if="$auth.isAuthenticated" >
+                <router-link class="nav-link" to="/browse">Availability List</router-link>
+              </li>
+
+              <!--  Order Manager -->
+              <li class="nav-item" v-if="$auth.isAuthenticated" >
+                <router-link class="nav-link" to="/ordermgr">Orders</router-link>
               </li>
 
               <!--  Help -->
@@ -25,9 +30,9 @@
               </li>
 
               <!--  Airtable test -->
-              <li class="nav-item">
+              <!-- <li class="nav-item" v-if="$auth.isAuthenticated">
                 <router-link class="nav-link" to="/airtabletest">Test</router-link>
-              </li>
+              </li> -->
             </ul>
 
             <!-- User Dropdown - User profile and login -->

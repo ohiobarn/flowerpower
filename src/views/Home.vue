@@ -1,9 +1,9 @@
 <template>
   <div>
-
-    <img alt="flowerpower" width="400" height="400" src="../assets/seedling-solid.svg" />
-    <Splash msg="Welcome to Flower Power!" />
-
+    <center>
+      <img alt="flowerpower" width="300" height="300" src="../assets/mrfc-logo-500.png" />
+      <Splash msg="Welcome to Flower Power!" />
+    </center>
   </div>
 </template>
 
