@@ -6,13 +6,14 @@
     <div class="row">
       <div class="col">
         <nav class="navbar navbar-expand-sm navbar-light bg-light">
+          <router-link class="nav-link" to="/"><img alt="flowerpower" width="50" height="50" src="./assets/logo-clear-bg.png" /></router-link>
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto ">
 
               <!--  Home -->
-              <li class="nav-item">
+              <!-- <li class="nav-item">
                 <router-link class="nav-link" to="/">Home</router-link>
-              </li>
+              </li> -->
 
               <!--  Availability List -->
               <li class="nav-item" v-if="$auth.isAuthenticated" >
