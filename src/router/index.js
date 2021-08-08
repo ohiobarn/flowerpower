@@ -1,10 +1,11 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import { authGuard } from "../auth/authGuard";
 import Home from '../views/Home.vue'
 import Profile from "../views/Profile.vue";
 import Help from "../views/Help.vue";
 import Browse from "../views/Browse.vue"
-import { authGuard } from "../auth/authGuard";
+import AirtableTest from '../views/AirtableTest.vue';
 
 Vue.use(VueRouter)
 
@@ -20,11 +21,18 @@ const routes = [
     component: Browse
   },
   {
+    path: '/AirtableTest',
+    name: 'AirtableTest',
+    component: AirtableTest,
+    beforeEnter: authGuard
+  },
+  {
     path: '/help',
     name: 'Help',
     component: Help,
     beforeEnter: authGuard
   },
+
   {
     path: "/profile",
     name: "profile",

@@ -11,8 +11,6 @@
       <hr>
       <pre>{{ JSON.stringify($auth.user, null, 2) }}</pre>
       <hr>  
-      <pre>claim: {{ JSON.stringify($auth.claim, null, 2) }}</pre>
-      <hr>
     </div>
   </div>
 </template>

@@ -23,11 +23,19 @@
               <li class="nav-item">
                 <router-link class="nav-link" to="/help">Help</router-link>
               </li>
+
+              <!--  Airtable test -->
+              <li class="nav-item">
+                <router-link class="nav-link" to="/airtabletest">Test</router-link>
+              </li>
             </ul>
 
             <!-- User Dropdown - User profile and login -->
-            <div class="nav-item dropdown" v-if="!$auth.loading">
-              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <div class="nav-item dropdown"> <!-- v-if="!$auth.loading" -->
+              <button v-if="$auth.loading" class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Log in
+              </button>
+              <button v-if="!$auth.loading" class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 {{ $auth.user.name }}
               </button>
               <!-- <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
