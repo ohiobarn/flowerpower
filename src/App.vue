@@ -36,7 +36,7 @@
               </li> -->
             </ul>
 
-            <!-- User Dropdown - User profile and login -->
+            <!-- User Dropdown - User Profile and login -->
             <div class="nav-item dropdown"> <!-- v-if="!$auth.loading" -->
               <button v-if="$auth.loading" class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Log in

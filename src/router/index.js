@@ -6,6 +6,7 @@ import Profile from "../views/Profile.vue";
 import Help from "../views/Help.vue";
 import Browse from "../views/Browse.vue"
 import OrderMgr from "../views/OrderMgr.vue"
+import OrderEdit from "../views/OrderEdit.vue"
 
 // import AirtableTest from '../views/AirtableTest.vue';
 
@@ -38,14 +39,21 @@ const routes = [
 
   {
     path: "/profile",
-    name: "profile",
+    name: "Profile",
     component: Profile,
     beforeEnter: authGuard
   },
   {
     path: "/ordermgr",
-    name: "ordermgr",
+    name: "OrderMgr",
     component: OrderMgr,
+    beforeEnter: authGuard
+  },
+  {
+    path: "/orderedit/:id",
+    name: "OrderEdit",
+    component: OrderEdit,
+    props: true,
     beforeEnter: authGuard
   }
   // {
