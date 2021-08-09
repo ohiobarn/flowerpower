@@ -1,0 +1,16 @@
+domains:
+- domain: app.madriverfloralcollective.com
+  type: PRIMARY
+name: flowerpower
+region: nyc
+static_sites:
+- build_command: npm run build
+  environment_slug: node-js
+  github:
+    branch: main
+    repo: ohiobarn/flowerpower
+  name: flowerpower
+  output_dir: dist
+  routes:
+  - path: /
+  source_dir: /
