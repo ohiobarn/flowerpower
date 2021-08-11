@@ -2,51 +2,60 @@
 
   <div class="cont">
 
-    <!--  NAV -->
-    <div class="row">
+    <!-- Nav Row -->
+    <div class="row fp-nav">
       <div class="col">
-        <nav class="navbar navbar-expand-sm navbar-light bg-light">
-          <router-link class="nav-link" to="/"><img alt="flowerpower" width="50" height="50" src="./assets/logo-clear-bg.png" /></router-link>
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto ">
+        <!-- Flow left and right -->
+        <router-link id="logo" class="inline" to="/"><img alt="flowerpower" width="40" height="40" src="./assets/logo-clear-bg.png" /></router-link>
+        <div id="user-dropdown" class="inline dropdown user-dropdown"> 
+          <button v-if="$auth.loading" class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Log in
+          </button>
+          <button v-if="!$auth.loading" class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {{ $auth.user.name }}
+          </button>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <router-link class="dropdown-item" v-if="$auth.isAuthenticated" to="/profile">Profile</router-link>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#" v-if="$auth.isAuthenticated"  @click="logout">Log out</a>
+            <a class="dropdown-item" href="#" v-if="!$auth.isAuthenticated" @click="login">Log in</a>
+          </div>
+        </div>    
 
-              <!--  Home -->
-              <!-- <li class="nav-item">
-                <router-link class="nav-link" to="/">Home</router-link>
-              </li> -->
 
-              <!--  Availability List -->
-              <li class="nav-item" v-if="$auth.isAuthenticated" >
-                <router-link class="nav-link" to="/browse">Availability List</router-link>
-              </li>
+        <!--  Nav Bar -->
+        <ul class="nav nav-tabs ">
 
-              <!--  Order Manager -->
-              <li class="nav-item" v-if="$auth.isAuthenticated" >
-                <router-link class="nav-link" to="/ordermgr">Orders</router-link>
-              </li>
+          <!--  Home -->
+          <li class="nav-item">
+            <router-link class="nav-link" to="/" exact-active-class="active" >Home</router-link>
+          </li>
 
-              <!--  Help -->
-              <li class="nav-item">
-                <router-link class="nav-link" to="/help">Help</router-link>
-              </li>
+          <!--  Availability List -->
+          <li class="nav-item" v-if="$auth.isAuthenticated" >
+            <router-link class="nav-link" to="/browse" active-class="active" >Availability List</router-link>
+          </li>
 
-              <!--  Airtable test -->
-              <!-- <li class="nav-item" v-if="$auth.isAuthenticated">
-                <router-link class="nav-link" to="/airtabletest">Test</router-link>
-              </li> -->
-            </ul>
+          <!--  Order Manager -->
+          <li class="nav-item" v-if="$auth.isAuthenticated" >
+            <router-link class="nav-link" to="/order" active-class="active" >Orders</router-link>
+          </li>
 
-            <!-- User Dropdown - User Profile and login -->
-            <div class="nav-item dropdown"> <!-- v-if="!$auth.loading" -->
+          <!--  Help -->
+          <li class="nav-item">
+            <router-link class="nav-link" to="/help" active-class="active" >Help</router-link>
+          </li>
+
+          
+          <!-- User -->
+          <!-- <li>
+            <div class="nav-item dropdown"> 
               <button v-if="$auth.loading" class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Log in
               </button>
               <button v-if="!$auth.loading" class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 {{ $auth.user.name }}
               </button>
-              <!-- <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                {{ $auth.user.name }}
-              </a> -->
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <router-link class="dropdown-item" v-if="$auth.isAuthenticated" to="/profile">Profile</router-link>
                 <div class="dropdown-divider"></div>
@@ -54,10 +63,10 @@
                 <a class="dropdown-item" href="#" v-if="!$auth.isAuthenticated" @click="login">Log in</a>
               </div>
             </div>
-
-          </div>
-        </nav>
+          </li> -->
+        </ul>
       </div>
+
     </div>
 
     <!--  Page Content-->
@@ -92,5 +101,28 @@ export default {
   },
 };
 </script>
+
 <style>
+
+.fp-nav {
+background-color: #f6edf9;
+}
+
+
+.user-dropdown  { text-align: right; }
+
+#logo {
+    float:left; 
+    background:#f6edf9;
+    width:50px;
+    height:40px;
+    text-align: left;
+}
+#user-dropdown{
+    float:right;
+    background:#f6edf9;
+    width:50%;
+    height:40px;
+    text-align: right;
+}
 </style>

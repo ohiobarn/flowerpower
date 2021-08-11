@@ -1,9 +1,8 @@
 <template>
   <div>
-    <p>Order No. {{ order.OrderNo }}</p>
+    <h3>Order No. {{ order.OrderNo }}</h3>
 
     <form>
-      <h3>Order Header</h3>
       <hr />
       <div class="row">
         <div class="col">
@@ -15,7 +14,7 @@
         <div class="form-row">
           <div class="form-group">
             <label for="TeamMemberName">Team Member Name</label>
-            <input type="text" class="form-control" id="TeamMemberName" placeholder="Kim"
+            <input type="text" class="form-control" id="TeamMemberName" placeholder="Karen"
             />
           </div>
         </div>
@@ -67,7 +66,7 @@
       <!--
         Line items
       -->
-      <small class="form-text text-muted">All varieties sold at 10 stems per bunch (spb) unless stated otherwise</small>
+      
       <div class="form-row">
         <div class="col-8">
           <label for="Variety">Variety</label>
@@ -76,13 +75,13 @@
           <label for="Quantity">Bunches</label>
         </div>
         <div class="col-2">
-          <label for="ExtendPrice">Extend Price</label>
+          <label for="ExtendPrice">Extended</label>
         </div>
       </div>
 
       <div class="form-row" v-for="line of lines" :key="line.id">
         <div class="col-8">
-          <select class="form-control" id="Variety">
+          <select class="form-control" :id="'Variety_'+line.id">
             <option value=""></option>
             <option v-for="rec in forecastRecords" :key="rec.id" :value="rec.id">
               <p v-if='rec["Stems per Bunch"] != 10'>
@@ -95,13 +94,13 @@
           </select>
         </div>
         <div class="col-1">
-          <input id="Quantity" type="text" class="form-control" placeholder=""/>
+          <input :id="'Quantity_'+line.id" :value="lines[line.id].quantity" type="number" class="form-control" placeholder="" v-on:click="extend(line.id,$event)"/>
         </div>
         <div class="col-2">
-          <input id="ExtendPrice" type="text" class="form-control" placeholder=""/>
+          <input :id="'Extended_'+line.id" :value="lines[line.id].extended" type="text" class="form-control" placeholder=""/>
         </div>
       </div>
-
+      <small class="form-text text-muted">All varieties sold at 10 stems per bunch (spb) unless stated otherwise</small>  
 
     </form>
     <br />
@@ -118,20 +117,27 @@ export default {
   data(){
     return {
       lines: [ 
-      { id: '1' },
-      { id: '2' },
-      { id: '3' },
-      { id: '4' },
-      { id: '5' },
-      { id: '6' },
-      { id: '7' },
-      { id: '8' },
-      { id: '9' }
+      { id: 0 , quantity: 0, extended: ''},
+      { id: 1 , quantity: 0, extended: ''},
+      { id: 2 , quantity: 0, extended: ''},
+      { id: 3 , quantity: 0, extended: ''}
      ]
     }
     
+  },
+  methods: {
+    extend: function (lineID, event) {
+
+      // DEVTODO - get price from selection
+      // fake price
+      let p = 1.23
+      this.lines[lineID].quantity = event.target.value
+      this.lines[lineID].extended = "$" + parseInt(this.lines[lineID].quantity, 10) * parseFloat(p)
+
+    }
   }
-};
+
+}
 </script>
 
 <style>

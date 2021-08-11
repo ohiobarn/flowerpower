@@ -44,13 +44,13 @@ const routes = [
     beforeEnter: authGuard
   },
   {
-    path: "/ordermgr",
+    path: "/order",
     name: "OrderMgr",
     component: OrderMgr,
     beforeEnter: authGuard
   },
   {
-    path: "/orderedit/:id",
+    path: "/order/edit/:id",
     name: "OrderEdit",
     component: OrderEdit,
     props: true,
