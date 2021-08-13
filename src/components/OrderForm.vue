@@ -66,13 +66,13 @@
       <!--
         Line items
       -->
-      
+
       <div class="form-row">
         <div class="col-8">
           <label for="Variety">Variety</label>
         </div>
         <div class="col-1">
-          <label for="Quantity">Bunches</label>
+          <label for="Quantity">Bu</label>
         </div>
         <div class="col-2">
           <label for="ExtendPrice">Extended</label>
@@ -81,9 +81,11 @@
 
       <div class="form-row" v-for="line of lines" :key="line.id">
         <div class="col-8">
-          <select class="form-control" :id="'Variety_'+line.id">
-            <option value=""></option>
+          <select class="form-control" :id="'Variety_'+line.id" v-on:change="onChangeVariety(line.id,$event)">
+          <!-- <select class="form-control" :id="'Variety_'+line.id"> -->
+            <option value="" placeholder="Variety"></option>
             <option v-for="rec in forecastRecords" :key="rec.id" :value="rec.id">
+              <!-- <option v-for="(recKey, rec) in forecastMap" :key="recKey" :value="recKey"> -->
               <p v-if='rec["Stems per Bunch"] != 10'>
                 {{ rec.Crop }} - {{ rec.Variety }} ({{ rec["SKU #"] }}) - ${{rec["Price per Bunch"] }}/bu @ {{ rec["Stems per Bunch"] }} spb
               </p>
@@ -94,10 +96,10 @@
           </select>
         </div>
         <div class="col-1">
-          <input :id="'Quantity_'+line.id" :value="lines[line.id].quantity" type="number" class="form-control" placeholder="" v-on:click="extend(line.id,$event)"/>
+          <input :id="'Quantity_'+line.id" :value="lines[line.id].quantity" type="number" class="form-control" placeholder="" v-on:change="onChangeQuantity(line.id,$event)"/>
         </div>
         <div class="col-2">
-          <input :id="'Extended_'+line.id" :value="lines[line.id].extended" type="text" class="form-control" placeholder=""/>
+          <input :id="'Extended_'+line.id" :value="lines[line.id].extended" type="text" class="form-control" placeholder="" readonly="true"/>
         </div>
       </div>
       <small class="form-text text-muted">All varieties sold at 10 stems per bunch (spb) unless stated otherwise</small>  
@@ -105,6 +107,10 @@
     </form>
     <br />
     <br />
+    <br />
+    <br />
+    
+    
   </div>
 </template>
 
@@ -112,30 +118,71 @@
 export default {
   props: {
     order: Object,
-    forecastRecords: Array,
+    forecastRecords: [],
+    
   },
   data(){
+    
     return {
       lines: [ 
-      { id: 0 , quantity: 0, extended: ''},
-      { id: 1 , quantity: 0, extended: ''},
-      { id: 2 , quantity: 0, extended: ''},
-      { id: 3 , quantity: 0, extended: ''}
-     ]
+      { id: 0 , quantity: 0, price: 0, extended: 0},
+      { id: 1 , quantity: 0, price: 0, extended: 0},
+      { id: 2 , quantity: 0, price: 0, extended: 0},
+      { id: 3 , quantity: 0, price: 0, extended: 0}
+     ],
+     forecastMap: new Map()
     }
     
   },
   methods: {
-    extend: function (lineID, event) {
+    onChangeVariety(lineID, event) {
+      // get price from event
+      let rec = this.forecastMap.get(event.target.value)
+      console.log(rec["Price per Bunch"])
 
-      // DEVTODO - get price from selection
-      // fake price
-      let p = 1.23
-      this.lines[lineID].quantity = event.target.value
-      this.lines[lineID].extended = "$" + parseInt(this.lines[lineID].quantity, 10) * parseFloat(p)
+      //update lines
+      this.lines[lineID].price = rec["Price per Bunch"]
 
+      this.refreshLines() 
+    },
+    onChangeQuantity(lineID, event) {
+
+      let qty = parseInt(event.target.value)
+      this.lines[lineID].quantity = qty
+      
+      this.refreshLines()
+    },
+    refreshLines(){
+      for (let i = 0; i < this.lines.length; i++) {
+
+        let qty = parseInt(this.lines[i].quantity)
+        let price = parseFloat(this.lines[i].price)
+        let extend = qty * price
+
+        if (isNaN(extend)) {
+          this.lines[i].price = ""
+          // this.lines[i].quantity = ""
+          this.lines[i].extended = ""
+        } else{
+          this.lines[i].extended = qty * price
+        }
+        
+      }
     }
-  }
+
+  },
+  updated(){                                                                     // Create map from array
+
+    if (this.forecastMap.size == 0) {
+      console.log("Load forecastMap")
+      for (let i = 0; i < this.forecastRecords.length; i++) {
+        this.forecastMap.set(this.forecastRecords[i].id,this.forecastRecords[i])
+      }
+    }
+    
+    this.refreshLines()
+  },
+
 
 }
 </script>
