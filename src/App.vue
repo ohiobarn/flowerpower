@@ -42,7 +42,7 @@
           </li>
 
           <!--  Help -->
-          <li class="nav-item">
+          <li class="nav-item" v-if="$auth.isAuthenticated">
             <router-link class="nav-link" to="/help" active-class="active" >Help</router-link>
           </li>
 

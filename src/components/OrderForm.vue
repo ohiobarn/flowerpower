@@ -4,21 +4,24 @@
 
     <form>
       <hr />
-      <div class="row">
+      <div class="form-row">
         <div class="col">
           <div class="form-group">
             <label for="ClientJobName">Client/Job Name</label>
             <input type="text" class="form-control" id="ClientJobName" placeholder="The Jonson Wedding"/>
           </div>
         </div>
-        <div class="form-row">
+      </div>
+
+      <div class="form-row">
+        <div class="col">
           <div class="form-group">
             <label for="TeamMemberName">Team Member Name</label>
-            <input type="text" class="form-control" id="TeamMemberName" placeholder="Karen"
-            />
+            <input type="text" class="form-control" id="TeamMemberName" placeholder="Karen"/>
           </div>
         </div>
       </div>
+
       <div class="form-row">
         <div class="col">
           <small class="form-text text-muted">
@@ -44,9 +47,6 @@
             <small id="DueDateHelp" class="form-text text-muted">This is the pickup or delivery date the order.</small>
           </div>
         </div>
-        <div class="col">
-          <p></p>
-        </div>
       </div>
 
       <div class="form-row">
@@ -69,20 +69,20 @@
       <hr>
 
       <div class="form-row">
-        <div class="col-8">
+        <div class="col">
           <label for="Variety">Variety</label>
         </div>
-        <div class="col-1">
+        <div class="col-2">
           <label for="Quantity">Bu</label>
         </div>
-        <div class="col-2">
+        <div class="col-3">
           <label for="ExtendPrice">Extended</label>
         </div>
       </div>
 
       <div class="form-row" v-for="line of lines" :key="line.idx">
 
-        <div class="col-8">
+        <div class="col">
           <select class="form-control" :id="'Variety_'+line.idx" v-on:change="onChangeVariety()" v-model="lines[line.idx].id">
             <option value="" placeholder="" ></option>
             <option v-for="rec in forecastRecords" :key="rec.id" :value="rec.id" >
@@ -93,38 +93,38 @@
           </select>
         </div>
 
-        <div class="col-1">
+        <div class="col-2">
           <input :id="'Quantity_'+line.idx"  v-model="lines[line.idx].quantity" type="number" class="form-control" placeholder="" v-on:change="onChangeQuantity()"/>
         </div>
 
-        <div class="col-2">
+        <div class="col-3">
           <input :id="'Extended_'+line.idx" :value="lines[line.idx].extended" type="number" class="form-control" placeholder="" readonly="true"/>
         </div>
 
       </div>
 
       <div class="form-row">
-        <div class="col-8">
+        <div class="col">
             <p></p>
         </div>
-        <div class="col-1">
+        <div class="col-2">
           <p></p>
         </div>
 
-        <div class="col-2">
+        <div class="col-3">
           <hr>
         </div>        
       </div>
       
       <div class="form-row">
-        <div class="col-8">
+        <div class="col">
             <small class="form-text text-muted">All varieties sold at 10 stems per bunch (spb) unless stated otherwise</small>  
         </div>
-        <div class="col-1">
+        <div class="col-2">
           <p></p>
         </div>
 
-        <div class="col-2">
+        <div class="col-3">
           <input :id="orderTotal"  :value="orderTotal" type="number" class="form-control" placeholder="0.00" readonly="true"/>
         </div>        
       </div>
