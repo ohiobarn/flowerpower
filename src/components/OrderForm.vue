@@ -66,6 +66,7 @@
       <!--
         Line items
       -->
+      <hr>
 
       <div class="form-row">
         <div class="col-8">
@@ -79,30 +80,55 @@
         </div>
       </div>
 
-      <div class="form-row" v-for="line of lines" :key="line.id">
+      <div class="form-row" v-for="line of lines" :key="line.idx">
+
         <div class="col-8">
-          <select class="form-control" :id="'Variety_'+line.id" v-on:change="onChangeVariety(line.id,$event)">
-          <!-- <select class="form-control" :id="'Variety_'+line.id"> -->
-            <option value="" placeholder="Variety"></option>
-            <option v-for="rec in forecastRecords" :key="rec.id" :value="rec.id">
-              <!-- <option v-for="(recKey, rec) in forecastMap" :key="recKey" :value="recKey"> -->
-              <p v-if='rec["Stems per Bunch"] != 10'>
-                {{ rec.Crop }} - {{ rec.Variety }} ({{ rec["SKU #"] }}) - ${{rec["Price per Bunch"] }}/bu @ {{ rec["Stems per Bunch"] }} spb
-              </p>
-              <p v-else>
-                {{ rec.Crop }} - {{ rec.Variety }} ({{ rec["SKU #"] }}) - ${{rec["Price per Bunch"] }}/bu
-              </p>
+          <select class="form-control" :id="'Variety_'+line.idx" v-on:change="onChangeVariety()" v-model="lines[line.idx].id">
+            <option value="" placeholder="" ></option>
+            <option v-for="rec in forecastRecords" :key="rec.id" :value="rec.id" >
+              <!-- if using a map <option v-for="(recKey, rec) in forecastMap" :key="recKey" :value="recKey"> -->
+              <p v-if='rec["Stems per Bunch"] != 10'>{{ rec.Crop }} - {{ rec.Variety }} ({{ rec["SKU #"] }}) - ${{rec["Price per Bunch"] }}/bu @ {{ rec["Stems per Bunch"] }} spb</p>
+              <p v-else>{{ rec.Crop }} - {{ rec.Variety }} ({{ rec["SKU #"] }}) - ${{rec["Price per Bunch"] }}/bu</p>
             </option>  
           </select>
         </div>
+
         <div class="col-1">
-          <input :id="'Quantity_'+line.id" :value="lines[line.id].quantity" type="number" class="form-control" placeholder="" v-on:change="onChangeQuantity(line.id,$event)"/>
+          <input :id="'Quantity_'+line.idx"  v-model="lines[line.idx].quantity" type="number" class="form-control" placeholder="" v-on:change="onChangeQuantity()"/>
         </div>
+
         <div class="col-2">
-          <input :id="'Extended_'+line.id" :value="lines[line.id].extended" type="text" class="form-control" placeholder="" readonly="true"/>
+          <input :id="'Extended_'+line.idx" :value="lines[line.idx].extended" type="number" class="form-control" placeholder="" readonly="true"/>
         </div>
+
       </div>
-      <small class="form-text text-muted">All varieties sold at 10 stems per bunch (spb) unless stated otherwise</small>  
+
+      <div class="form-row">
+        <div class="col-8">
+            <p></p>
+        </div>
+        <div class="col-1">
+          <p></p>
+        </div>
+
+        <div class="col-2">
+          <hr>
+        </div>        
+      </div>
+      
+      <div class="form-row">
+        <div class="col-8">
+            <small class="form-text text-muted">All varieties sold at 10 stems per bunch (spb) unless stated otherwise</small>  
+        </div>
+        <div class="col-1">
+          <p></p>
+        </div>
+
+        <div class="col-2">
+          <input :id="orderTotal"  :value="orderTotal" type="number" class="form-control" placeholder="0.00" readonly="true"/>
+        </div>        
+      </div>
+      
 
     </form>
     <br />
@@ -110,7 +136,7 @@
     <br />
     <br />
     
-    
+
   </div>
 </template>
 
@@ -124,54 +150,60 @@ export default {
   data(){
     
     return {
+      var1: "",
       lines: [ 
-      { id: 0 , quantity: 0, price: 0, extended: 0},
-      { id: 1 , quantity: 0, price: 0, extended: 0},
-      { id: 2 , quantity: 0, price: 0, extended: 0},
-      { id: 3 , quantity: 0, price: 0, extended: 0}
+      { idx: 0, id: "", sku: "", quantity: 0, price: 0, extended: 0},
+      { idx: 1, id: "", sku: "", quantity: 0, price: 0, extended: 0},
+      { idx: 2, id: "", sku: "", quantity: 0, price: 0, extended: 0},
+      { idx: 3, id: "", sku: "", quantity: 0, price: 0, extended: 0}
      ],
+     orderTotal: 0,
      forecastMap: new Map()
     }
     
   },
   methods: {
-    onChangeVariety(lineID, event) {
-      // get price from event
-      let rec = this.forecastMap.get(event.target.value)
-      console.log(rec["Price per Bunch"])
-
-      //update lines
-      this.lines[lineID].price = rec["Price per Bunch"]
-
+    onChangeVariety() {
       this.refreshLines() 
     },
-    onChangeQuantity(lineID, event) {
-
-      let qty = parseInt(event.target.value)
-      this.lines[lineID].quantity = qty
-      
+    onChangeQuantity() {
       this.refreshLines()
     },
     refreshLines(){
+      console.log("refreshing lines")
+      let orderTotal = 0
+
       for (let i = 0; i < this.lines.length; i++) {
+        
+        // get record information from Map
+        let rec = this.forecastMap.get(this.lines[i].id)
 
-        let qty = parseInt(this.lines[i].quantity)
-        let price = parseFloat(this.lines[i].price)
-        let extend = qty * price
+        // Don't set the quantity go negative
+        if (this.lines[i].quantity < 0 ) {
+          this.lines[i].quantity = 0
+        }
 
-        if (isNaN(extend)) {
-          this.lines[i].price = ""
-          // this.lines[i].quantity = ""
-          this.lines[i].extended = ""
-        } else{
-          this.lines[i].extended = qty * price
+        // Only need to refresh line if a variety is selected
+        if (typeof rec != "undefined") {
+          
+          // Get the price from forecastMap for selected item
+          this.lines[i].price = rec["Price per Bunch"]
+
+          // Extend the price
+          let extended = Number(this.lines[i].price) * Number(this.lines[i].quantity)
+          this.lines[i].extended = Number(extended).toFixed(2)
+
+          orderTotal = orderTotal + extended
         }
         
+         
       }
+      this.orderTotal = Number(orderTotal).toFixed(2)
     }
 
   },
-  updated(){                                                                     // Create map from array
+  // Create map from array
+  updated(){                                                                     
 
     if (this.forecastMap.size == 0) {
       console.log("Load forecastMap")
@@ -180,7 +212,8 @@ export default {
       }
     }
     
-    this.refreshLines()
+    // Not sure if this is needed but it is fast
+    // this.refreshLines()
   },
 
 
