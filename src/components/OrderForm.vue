@@ -8,7 +8,7 @@
         <div class="col">
           <div class="form-group">
             <label for="ClientJobName">Client/Job Name</label>
-            <input type="text" class="form-control" id="ClientJobName" placeholder="The Jonson Wedding"/>
+            <input type="text" class="form-control" id="ClientJobName" placeholder="The Johnson Wedding"/>
           </div>
         </div>
       </div>
@@ -25,8 +25,8 @@
       <div class="form-row">
         <div class="col">
           <small class="form-text text-muted">
-            When you need to contact us about this order it may be more convient
-            to use to the client or job name rather than having to remember the
+            When you need to contact us about this order it may be more convenient
+            to use the client or job name rather than having to remember the
             order number. And if we need to reach out to you, please give us a
             contact name so we know who to ask for.
           </small>
@@ -83,10 +83,9 @@
       <div class="form-row" v-for="line of lines" :key="line.idx">
 
         <div class="col">
-          <select class="form-control" :id="'Variety_'+line.idx" v-on:change="onChangeVariety()" v-model="lines[line.idx].id">
+          <select class="form-control form-control-sm" :id="'Variety_'+line.idx" v-on:change="onChangeVariety()" v-model="lines[line.idx].id">
             <option value="" placeholder="" ></option>
             <option v-for="rec in forecastRecords" :key="rec.id" :value="rec.id" >
-              <!-- if using a map <option v-for="(recKey, rec) in forecastMap" :key="recKey" :value="recKey"> -->
               <p v-if='rec["Stems per Bunch"] != 10'>{{ rec.Crop }} - {{ rec.Variety }} ({{ rec["SKU #"] }}) - ${{rec["Price per Bunch"] }}/bu @ {{ rec["Stems per Bunch"] }} spb</p>
               <p v-else>{{ rec.Crop }} - {{ rec.Variety }} ({{ rec["SKU #"] }}) - ${{rec["Price per Bunch"] }}/bu</p>
             </option>  
@@ -105,7 +104,7 @@
 
       <div class="form-row">
         <div class="col">
-            <p></p>
+            <p><small class="form-text text-muted">All varieties sold at 10 stems per bunch (spb) unless stated otherwise</small></p>
         </div>
         <div class="col-2">
           <p></p>
@@ -118,7 +117,7 @@
       
       <div class="form-row">
         <div class="col">
-            <small class="form-text text-muted">All varieties sold at 10 stems per bunch (spb) unless stated otherwise</small>  
+            <p></p>  
         </div>
         <div class="col-2">
           <p></p>
@@ -170,7 +169,6 @@ export default {
       this.refreshLines()
     },
     refreshLines(){
-      console.log("refreshing lines")
       let orderTotal = 0
 
       for (let i = 0; i < this.lines.length; i++) {
@@ -206,14 +204,11 @@ export default {
   updated(){                                                                     
 
     if (this.forecastMap.size == 0) {
-      console.log("Load forecastMap")
       for (let i = 0; i < this.forecastRecords.length; i++) {
         this.forecastMap.set(this.forecastRecords[i].id,this.forecastRecords[i])
       }
     }
-    
-    // Not sure if this is needed but it is fast
-    // this.refreshLines()
+
   },
 
 

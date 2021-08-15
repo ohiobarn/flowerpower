@@ -6,7 +6,6 @@
           <th scope="col">Order Number</th>
           <th scope="col">Client/Job</th>
           <th scope="col">Team Member</th>
-          <th scope="col">Notes</th>
         </tr>
       </thead>
       <tbody>
@@ -14,9 +13,8 @@
           <th scope="row">
               <router-link :to="{name: 'OrderEdit', params: {id: order.id}}">{{ order.OrderNo }}</router-link>
           </th>
-          <td>{{ order.ClientJobName }}</td>
-          <td>{{ order.TeamMemberName }}</td>
-          <td>{{ order.Notes }}</td>
+          <td>{{ order["Client/Job"] }}</td>
+          <td>{{ order["Team Member"]}}</td>
         </tr>
       </tbody>
     </table>

@@ -1,7 +1,10 @@
 <template>
-  <div>
+  <div id="most-outter">
+    <br>
     <h3>Order Manager</h3>
     <br>
+    <router-link class="btn btn-primary" tag="button" :to="{name: 'OrderEdit', params: {id: 'new'}}">New Order</router-link>
+    <br>&nbsp;
     <OrderList :orders="orders" />
   </div>
 </template>
@@ -13,22 +16,69 @@ export default {
   components: {
     OrderList
   },
+
   data() {
     return {
-      orders: [
-        { id: 1, OrderNo: 1, ClientJobName: 'Job 1', TeamMemberName: 'Frank', Notes: 'Order notes'},
-        { id: 2, OrderNo: 2, ClientJobName: 'Job 2', TeamMemberName: 'Bill', Notes: 'Order notes'},
-        { id: 3, OrderNo: 3, ClientJobName: 'Job 3', TeamMemberName: 'Bob', Notes: 'Order notes'}
-      ]
+      orders: []
     }
 
   },
+  mounted() {
+    this.getOrders()
+  },
+
   methods: {
-    //todo
+    getOrders() {
+      //
+      // Array to hold query records
+      //
+      var orders = []
+      var account = this.$auth.user.email
+
+      var Airtable = require('airtable');
+      Airtable.configure({
+          endpointUrl: 'https://api.airtable.com',
+          apiKey: this.$auth.user['https://app.madriverfloralcollective.com/airtable'] 
+      });
+      var base = Airtable.base('apptDZu7d1mrDMIFp'); //MRFC
+
+      base('Order').select({
+          // maxRecords: 999,
+          pageSize: 25,
+          view: "fp-grid",
+          filterByFormula: 'Account = "' + account + '"'
+      }).eachPage(function page(records, fetchNextPage) {
+          // This function (`page`) will get called for each page of records.
+
+          records.forEach(function(record) {
+              var order = record.fields
+              order.id = record.getId()
+              orders.push(order)
+          });
+
+          // To fetch the next page of records, call `fetchNextPage`.
+          // If there are more records, `page` will get called again.
+          // If there are no more records, `done` will get called.
+          fetchNextPage();
+
+      }, function done(err) {
+          if (err) { console.error(err); return; }
+      });
+
+      //
+      // Populate data
+      //
+      this.orders = orders
+
+    }
   }
 }
 </script>
 
 <style>
+
+#most-outter{
+  padding: 10px;
+}
 
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="most-outter">
     <p></p>
     <p>Use the grid below to browse the current forecast. <b>Tip,</b> click the <b>...</b> icon to print or download a copy of the forecast. Also, click the <b>View larger version</b> link located in the bottom right section of the grid to view a larger grid. </p>
     <div>
@@ -21,4 +21,9 @@ export default {};
 </script>
 
 <style>
+
+#most-outter{
+  padding: 20px;
+}
+
 </style>
