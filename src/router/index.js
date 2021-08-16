@@ -50,7 +50,7 @@ const routes = [
     beforeEnter: authGuard
   },
   {
-    path: "/order/edit/:id",
+    path: "/order/edit/:RecID",
     name: "OrderEdit",
     component: OrderEdit,
     props: true,
