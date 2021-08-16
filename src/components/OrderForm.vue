@@ -8,7 +8,7 @@
         <div class="col">
           <div class="form-group">
             <label for="ClientJobName">Client/Job Name</label>
-            <input type="text" class="form-control" id="ClientJobName" placeholder="The Johnson Wedding"/>
+            <input type="text" v-model="order['Client/Job']" class="form-control" id="ClientJobName" placeholder="The Johnson Wedding"/>
           </div>
         </div>
       </div>
@@ -17,7 +17,7 @@
         <div class="col">
           <div class="form-group">
             <label for="TeamMemberName">Team Member Name</label>
-            <input type="text" class="form-control" id="TeamMemberName" placeholder="Karen"/>
+            <input type="text" v-model="order['Team Member']" class="form-control" id="TeamMemberName" placeholder="Karen"/>
           </div>
         </div>
       </div>
@@ -43,7 +43,7 @@
         <div class="col">
           <div class="form-group">
             <label for="DueDate">Due Date</label>
-            <input type="text" class="form-control" id="DueDate" placeholder="mm/dd/yyyy" aria-describedby="DueDateHelp"/>
+            <input type="text" v-model="order['Due Date']" class="form-control" id="DueDate" placeholder="mm/dd/yyyy" aria-describedby="DueDateHelp"/>
             <small id="DueDateHelp" class="form-text text-muted">This is the pickup or delivery date the order.</small>
           </div>
         </div>
@@ -53,7 +53,7 @@
         <div class="col">
           <div class="form-group">
             <label for="Notes">Notes</label>
-            <textarea class="form-control" id="Notes" rows="3"></textarea>
+            <textarea v-model="order.Notes" class="form-control" id="Notes" rows="3"></textarea>
             <small id="NotesHelp" class="form-text text-muted">Please provide any notes that may be useful in fulfilling this order.</small>
           </div>
         </div>
@@ -83,9 +83,9 @@
       <div class="form-row" v-for="line of lines" :key="line.idx">
 
         <div class="col">
-          <select class="form-control form-control-sm" :id="'Variety_'+line.idx" v-on:change="onChangeVariety()" v-model="lines[line.idx].id">
+          <select class="form-control form-control-sm" :id="'Variety_'+line.idx" v-on:change="onChangeVariety()" v-model="lines[line.idx].RecID">
             <option value="" placeholder="" ></option>
-            <option v-for="rec in forecastRecords" :key="rec.id" :value="rec.id" >
+            <option v-for="rec in forecastRecords" :key="rec.RecID" :value="rec.RecID" >
               <p v-if='rec["Stems per Bunch"] != 10'>{{ rec.Crop }} - {{ rec.Variety }} ({{ rec["SKU #"] }}) - ${{rec["Price per Bunch"] }}/bu @ {{ rec["Stems per Bunch"] }} spb</p>
               <p v-else>{{ rec.Crop }} - {{ rec.Variety }} ({{ rec["SKU #"] }}) - ${{rec["Price per Bunch"] }}/bu</p>
             </option>  
@@ -104,7 +104,7 @@
 
       <div class="form-row">
         <div class="col">
-            <p><small class="form-text text-muted">All varieties sold at 10 stems per bunch (spb) unless stated otherwise</small></p>
+            <p></p>
         </div>
         <div class="col-2">
           <p></p>
@@ -117,7 +117,7 @@
       
       <div class="form-row">
         <div class="col">
-            <p></p>  
+            <p><small class="form-text text-muted">All varieties sold at 10 stems per bunch (spb) unless stated otherwise</small></p>  
         </div>
         <div class="col-2">
           <p></p>
@@ -151,10 +151,10 @@ export default {
     return {
       var1: "",
       lines: [ 
-      { idx: 0, id: "", sku: "", quantity: 0, price: 0, extended: 0},
-      { idx: 1, id: "", sku: "", quantity: 0, price: 0, extended: 0},
-      { idx: 2, id: "", sku: "", quantity: 0, price: 0, extended: 0},
-      { idx: 3, id: "", sku: "", quantity: 0, price: 0, extended: 0}
+      { idx: 0, RecID: "", sku: "", quantity: 0, price: 0, extended: 0},
+      { idx: 1, RecID: "", sku: "", quantity: 0, price: 0, extended: 0},
+      { idx: 2, RecID: "", sku: "", quantity: 0, price: 0, extended: 0},
+      { idx: 3, RecID: "", sku: "", quantity: 0, price: 0, extended: 0}
      ],
      orderTotal: 0,
      forecastMap: new Map()
@@ -174,7 +174,7 @@ export default {
       for (let i = 0; i < this.lines.length; i++) {
         
         // get record information from Map
-        let rec = this.forecastMap.get(this.lines[i].id)
+        let rec = this.forecastMap.get(this.lines[i].RecID)
 
         // Don't set the quantity go negative
         if (this.lines[i].quantity < 0 ) {
@@ -205,7 +205,7 @@ export default {
 
     if (this.forecastMap.size == 0) {
       for (let i = 0; i < this.forecastRecords.length; i++) {
-        this.forecastMap.set(this.forecastRecords[i].id,this.forecastRecords[i])
+        this.forecastMap.set(this.forecastRecords[i].RecID,this.forecastRecords[i])
       }
     }
 

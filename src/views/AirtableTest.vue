@@ -16,7 +16,7 @@
           <th scope="col"><i>spb</i></th>
         </tr>
       </thead>
-      <tr v-for="rec in forecastRecords" :key="rec.id">
+      <tr v-for="rec in forecastRecords" :key="rec.RecID">
         <td v-if="!rec.Image || !rec.Image.length"></td>
         <td v-else><img :src="rec.Image[0].thumbnails.small.url"></td>
         <td>{{ rec['SKU #'] }}</td>
@@ -62,7 +62,6 @@ export default {
 
         records.forEach(function(record) {
             var rec = record.fields
-            rec.id = record.getId()
             recs.push(rec)
         });
 
