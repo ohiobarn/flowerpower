@@ -3,7 +3,7 @@
     <br>
     <h3>Order Manager</h3>
     <br>
-    <router-link class="btn btn-primary" tag="button" :to="{name: 'OrderEdit', params: {id: 'new'}}">New Order</router-link>
+    <router-link class="btn btn-primary" :to="{name: 'OrderEdit', params: {RecID: 'new'}}">New Order</router-link>
     <br>&nbsp;
     <OrderList :orders="orders" />
   </div>
@@ -52,8 +52,8 @@ export default {
 
           records.forEach(function(record) {
               var order = record.fields
-              order.id = record.getId()
               orders.push(order)
+              console.log(order)
           });
 
           // To fetch the next page of records, call `fetchNextPage`.
