@@ -9,16 +9,16 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarText">
         <ul class="navbar-nav mr-auto">
-          <li class="nav-item ">
+          <li class="nav-item " v-if="$auth.isAuthenticated">
             <router-link class="nav-link" to="/" exact-active-class="active" >Home</router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="$auth.isAuthenticated">
             <router-link class="nav-link" to="/browse" active-class="active" >Availability List</router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="$auth.isAuthenticated">
             <router-link class="nav-link" to="/order" active-class="active" >Orders</router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="$auth.isAuthenticated">
             <router-link class="nav-link" to="/help" active-class="active" >Help</router-link>
           </li>
         </ul>
@@ -28,7 +28,7 @@
                 Log in
               </button>
               <button v-if="!$auth.loading" class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                {{ $auth.user.name }}
+                {{ $auth.user.name }} 
               </button>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <router-link class="dropdown-item" v-if="$auth.isAuthenticated" to="/profile">Profile</router-link>
