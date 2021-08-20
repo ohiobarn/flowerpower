@@ -2,7 +2,7 @@
   <div id="most-outter">
     <br />
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-    <OrderForm :order="order" :forecastRecords="forecastRecords"/>
+    <OrderForm :order="order" :orderDetails="orderDetails" :forecastRecords="forecastRecords"/>
   </div>
 </template>
 
@@ -19,7 +19,8 @@ export default {
   data() {
     return {
       forecastRecords: [],
-      order: {}
+      order: {},
+      orderDetails: []
     }
   },
 
@@ -30,6 +31,9 @@ export default {
   methods: {
     getOrder(){
 
+      var orderDetails = []
+      var account = this.$auth.user.email
+
       var Airtable = require('airtable');
       Airtable.configure({
           endpointUrl: 'https://api.airtable.com',
@@ -39,6 +43,36 @@ export default {
       base('Order').find(this.RecID)
       .then( record => {
         this.order = record.fields
+
+        ///////////////////////////////////////////////////////
+        // Get Order Detail
+        //////////////////////////////////////////////////////
+        base('OrderDetail').select({
+          pageSize: 25,
+          view: "fp-grid",
+          filterByFormula: 'Account = "' + account + '"'
+        }).eachPage(function page(records, fetchNextPage) {
+            // This function (`page`) will get called for each page of records.
+
+            records.forEach(function(record) {
+              var orderDetail = record.fields
+              orderDetails.push(orderDetail)
+            });
+
+            // To fetch the next page of records, call `fetchNextPage`.
+            // If there are more records, `page` will get called again.
+            // If there are no more records, `done` will get called.
+            fetchNextPage();
+
+        }, function done(err) {
+            if (err) { console.error(err); return; }
+        });
+
+        //
+        // Populate data
+        //
+        this.orderDetails = orderDetails
+
       })
       .catch( err => {
         console.log(err)

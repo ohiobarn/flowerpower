@@ -53,7 +53,6 @@ export default {
           records.forEach(function(record) {
               var order = record.fields
               orders.push(order)
-              console.log(order)
           });
 
           // To fetch the next page of records, call `fetchNextPage`.

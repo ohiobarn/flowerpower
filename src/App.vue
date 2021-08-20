@@ -18,6 +18,7 @@
           <li class="nav-item" v-if="$auth.isAuthenticated">
             <router-link class="nav-link" to="/order" active-class="active" >Orders</router-link>
           </li>
+
           <li class="nav-item" v-if="$auth.isAuthenticated">
             <router-link class="nav-link" to="/help" active-class="active" >Help</router-link>
           </li>

@@ -55,7 +55,7 @@ const routes = [
     component: OrderEdit,
     props: true,
     beforeEnter: authGuard
-  }
+  },
   // {
   //   path: '/about',
   //   name: 'About',

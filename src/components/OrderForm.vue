@@ -80,24 +80,34 @@
         </div>
       </div>
 
-      <div class="form-row" v-for="line of lines" :key="line.idx">
+
+        <!-- DEVTODO - having trouble binding to elements of array, internets says you can bind to v-for alias 
+                      https://stackoverflow.com/questions/43014016/why-v-model-doesnt-work-with-an-array-and-v-for-loop  
+                      https://stackoverflow.com/questions/42629509/you-are-binding-v-model-directly-to-a-v-for-iteration-alias -->
+        <!-- <div class="form-row" v-for="detail of order.orderDetails" :key="detail.RecID"> -->
+        <div class="form-row" v-for="(detail, index ) in orderDetails" :key="index">
 
         <div class="col">
-          <select class="form-control form-control-sm" :id="'Variety_'+line.idx" v-on:change="onChangeVariety()" v-model="lines[line.idx].RecID">
+          <input v-model="detail.SKU" type="text" class="form-control" placeholder="" v-on:change="onChangeQuantity()"/>
+
+          <!-- DEVTODO - need to select based on SKU from detail -->
+          <!-- <select class="form-control form-control-sm"  v-on:change="onChangeVariety()" v-model="todo">
             <option value="" placeholder="" ></option>
             <option v-for="rec in forecastRecords" :key="rec.RecID" :value="rec.RecID" >
               <p v-if='rec["Stems per Bunch"] != 10'>{{ rec.Crop }} - {{ rec.Variety }} ({{ rec["SKU #"] }}) - ${{rec["Price per Bunch"] }}/bu @ {{ rec["Stems per Bunch"] }} spb</p>
               <p v-else>{{ rec.Crop }} - {{ rec.Variety }} ({{ rec["SKU #"] }}) - ${{rec["Price per Bunch"] }}/bu</p>
             </option>  
-          </select>
+          </select>   -->
+
         </div>
 
         <div class="col-2">
-          <input :id="'Quantity_'+line.idx"  v-model="lines[line.idx].quantity" type="number" class="form-control" placeholder="" v-on:change="onChangeQuantity()"/>
+          <!-- DEVTODO - not sure why that does not work  -->
+          <input v-model="orderDetails[index].Bunches" type="number" class="form-control" placeholder="" v-on:change="onChangeQuantity()"/>
         </div>
 
         <div class="col-3">
-          <input :id="'Extended_'+line.idx" :value="lines[line.idx].extended" type="number" class="form-control" placeholder="" readonly="true"/>
+          <input v-model="detail.Extended" type="number" class="form-control" placeholder="" readonly="true"/>
         </div>
 
       </div>
@@ -124,7 +134,7 @@
         </div>
 
         <div class="col-3">
-          <input :id="orderTotal"  :value="orderTotal" type="number" class="form-control" placeholder="0.00" readonly="true"/>
+          <input :value="orderTotal" type="number" class="form-control" placeholder="0.00" readonly="true"/>
         </div>        
       </div>
       
@@ -132,9 +142,6 @@
     </form>
     <br />
     <br />
-    <br />
-    <br />
-    
 
   </div>
 </template>
@@ -143,19 +150,12 @@
 export default {
   props: {
     order: Object,
-    forecastRecords: [],
-    
+    orderDetails: [],
+    forecastRecords: []
   },
   data(){
     
     return {
-      var1: "",
-      lines: [ 
-      { idx: 0, RecID: "", sku: "", quantity: 0, price: 0, extended: 0},
-      { idx: 1, RecID: "", sku: "", quantity: 0, price: 0, extended: 0},
-      { idx: 2, RecID: "", sku: "", quantity: 0, price: 0, extended: 0},
-      { idx: 3, RecID: "", sku: "", quantity: 0, price: 0, extended: 0}
-     ],
      orderTotal: 0,
      forecastMap: new Map()
     }
@@ -171,25 +171,28 @@ export default {
     refreshLines(){
       let orderTotal = 0
 
-      for (let i = 0; i < this.lines.length; i++) {
-        
-        // get record information from Map
-        let rec = this.forecastMap.get(this.lines[i].RecID)
+      var noLines = Number(this.orderDetails.length)
+      for (let i = 0; i < noLines; i++) {
+
+
+      //   // get record information from Map
+      //   // DEVTODO - need to get by SKU
+      //   // let rec = this.forecastMap.get(this.lines[i].RecID)
 
         // Don't set the quantity go negative
-        if (this.lines[i].quantity < 0 ) {
-          this.lines[i].quantity = 0
+        if (Number(this.orderDetails[i].Bunches) < 0 ) {
+          this.orderDetails[i].Bunches = 0
         }
 
         // Only need to refresh line if a variety is selected
-        if (typeof rec != "undefined") {
+        if (this.orderDetails[i].SKU != "") {
           
-          // Get the price from forecastMap for selected item
-          this.lines[i].price = rec["Price per Bunch"]
+          // DEVTODO - Get the price from forecastMap for selected item
+          // this.orderDetails[i].Price = rec["Price per Bunch"]
 
           // Extend the price
-          let extended = Number(this.lines[i].price) * Number(this.lines[i].quantity)
-          this.lines[i].extended = Number(extended).toFixed(2)
+          let extended = Number(this.orderDetails[i].Price) * Number(this.orderDetails[i].Bunches)
+          this.orderDetails[i].Extended = Number(extended).toFixed(2)
 
           orderTotal = orderTotal + extended
         }
@@ -203,6 +206,7 @@ export default {
   // Create map from array
   updated(){                                                                     
 
+    //DEVTODO - this needs to be keyed on SKU, 
     if (this.forecastMap.size == 0) {
       for (let i = 0; i < this.forecastRecords.length; i++) {
         this.forecastMap.set(this.forecastRecords[i].RecID,this.forecastRecords[i])
