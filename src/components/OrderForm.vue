@@ -84,21 +84,18 @@
       <div class="form-row" v-for="(detail, index ) in orderDetails" :key="index">
         <div class="col">
           
-
-          <!-- DEVTODO - need to select based on SKU from detail -->
           <select class="form-control form-control-sm"  v-on:change="onChangeVariety" v-model="orderDetails[index].SKU">
             <option value="" placeholder="select variety" ></option>
             <option v-for="rec in forecastRecords" :key="rec.SKU" :value="rec.SKU" >
-              <p v-if='rec["Stems per Bunch"] != 10'>{{ rec.Crop }} - {{ rec.Variety }} ({{ rec["SKU #"] }}) - ${{rec["Price per Bunch"] }}/bu @ {{ rec["Stems per Bunch"] }} spb</p>
-              <p v-else>{{ rec.Crop }} - {{ rec.Variety }} ({{ rec["SKU #"] }}) - ${{rec["Price per Bunch"] }}/bu</p>
+              <p v-if='rec["Stems per Bunch"] != 10'>{{ rec.Crop }}, {{ rec.Variety }} {{rec.Color}} ({{ rec["SKU #"] }}), ${{rec["Price per Bunch"] }}/bu @ {{ rec["Stems per Bunch"] }} spb</p>
+              <p v-else>{{ rec.Crop }}, {{ rec.Variety }}, {{rec.Color}} ({{ rec["SKU #"] }}), ${{rec["Price per Bunch"] }}/bu</p>
             </option>  
           </select>
-          <small><i>{{ detail.Crop }} - {{ detail.Variety }} ({{ detail.SKU }}) - ${{detail["Price per Bunch"] }}/bu @ {{ detail["Stems per Bunch"] }} spb</i></small>
-          <p></p>
+          <!-- <small><i>{{ detail.Crop }} - {{ detail.Variety }} ({{ detail.SKU }}) - ${{detail["Price per Bunch"] }}/bu @ {{ detail["Stems per Bunch"] }} spb</i></small>
+          <p></p> -->
         </div>
 
         <div class="col-2">
-          <!-- DEVTODO - not sure why that does not work  -->
           <input v-model="orderDetails[index].Bunches" type="number" class="form-control" placeholder="" v-on:change="onChangeQuantity"/>
         </div>
 
@@ -133,6 +130,23 @@
           <input :value="orderTotal" type="number" class="form-control" placeholder="0.00" readonly="true"/>
         </div>        
       </div>
+
+        
+      <hr>
+
+      <div class="form-row">
+        <div class="col">
+            <button type="button" class="btn btn-primary" v-on:click="saveOrder" >Save</button>  
+        </div>
+        <!-- <div class="col">
+            <p></p>
+        </div> -->
+        <div class="col">
+          <router-link to="/order" class="btn btn-secondary">Cancel</router-link> 
+        </div>        
+      </div>
+
+
       
 
     </form>
@@ -178,15 +192,13 @@ export default {
         // Only need to refresh line if a variety is selected
         if (this.orderDetails[i].SKU.length > 0) {
 
-          console.log("SKU exists")
-          console.log(this.orderDetails[i].SKU)
           let forecastRec = this.forecastMap.get(this.orderDetails[i].SKU)
 
-console.log(forecastRec)
-
-          this.orderDetails[i]["Price per Bunch"] = forecastRec["Price per Bunch"]
-          this.orderDetails[i].Variety = forecastRec.Variety
           this.orderDetails[i].Crop = forecastRec.Crop
+          this.orderDetails[i].Variety = forecastRec.Variety
+          this.orderDetails[i].Color = forecastRec.Color
+          this.orderDetails[i]["Price per Bunch"] = forecastRec["Price per Bunch"]
+          
 
           // Extend the price
           let extended = Number(this.orderDetails[i]["Price per Bunch"]) * Number(this.orderDetails[i].Bunches)
@@ -198,6 +210,12 @@ console.log(forecastRec)
          
       }
       this.orderTotal = Number(orderTotal).toFixed(2)
+    },
+    saveOrder(){
+      //DEVTODO - save to airtable
+      console.log("SAVE ORDER")
+      console.log(this.order)
+      console.log(this.orderDetails)
     }
 
   },
