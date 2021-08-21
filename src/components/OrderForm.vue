@@ -61,7 +61,7 @@
 
       <br />
       <h3>Order Detail</h3>
-      <hr />
+      <br />
 
       <!--
         Line items
@@ -81,29 +81,25 @@
       </div>
 
 
-        <!-- DEVTODO - having trouble binding to elements of array, internets says you can bind to v-for alias 
-                      https://stackoverflow.com/questions/43014016/why-v-model-doesnt-work-with-an-array-and-v-for-loop  
-                      https://stackoverflow.com/questions/42629509/you-are-binding-v-model-directly-to-a-v-for-iteration-alias -->
-        <!-- <div class="form-row" v-for="detail of order.orderDetails" :key="detail.RecID"> -->
-        <div class="form-row" v-for="(detail, index ) in orderDetails" :key="index">
-
+      <div class="form-row" v-for="(detail, index ) in orderDetails" :key="index">
         <div class="col">
-          <input v-model="detail.SKU" type="text" class="form-control" placeholder="" v-on:change="onChangeQuantity()"/>
+          
 
           <!-- DEVTODO - need to select based on SKU from detail -->
-          <!-- <select class="form-control form-control-sm"  v-on:change="onChangeVariety()" v-model="todo">
-            <option value="" placeholder="" ></option>
-            <option v-for="rec in forecastRecords" :key="rec.RecID" :value="rec.RecID" >
+          <select class="form-control form-control-sm"  v-on:change="onChangeVariety" v-model="orderDetails[index].SKU">
+            <option value="" placeholder="select variety" ></option>
+            <option v-for="rec in forecastRecords" :key="rec.SKU" :value="rec.SKU" >
               <p v-if='rec["Stems per Bunch"] != 10'>{{ rec.Crop }} - {{ rec.Variety }} ({{ rec["SKU #"] }}) - ${{rec["Price per Bunch"] }}/bu @ {{ rec["Stems per Bunch"] }} spb</p>
               <p v-else>{{ rec.Crop }} - {{ rec.Variety }} ({{ rec["SKU #"] }}) - ${{rec["Price per Bunch"] }}/bu</p>
             </option>  
-          </select>   -->
-
+          </select>
+          <small><i>{{ detail.Crop }} - {{ detail.Variety }} ({{ detail.SKU }}) - ${{detail["Price per Bunch"] }}/bu @ {{ detail["Stems per Bunch"] }} spb</i></small>
+          <p></p>
         </div>
 
         <div class="col-2">
           <!-- DEVTODO - not sure why that does not work  -->
-          <input v-model="orderDetails[index].Bunches" type="number" class="form-control" placeholder="" v-on:change="onChangeQuantity()"/>
+          <input v-model="orderDetails[index].Bunches" type="number" class="form-control" placeholder="" v-on:change="onChangeQuantity"/>
         </div>
 
         <div class="col-3">
@@ -173,25 +169,27 @@ export default {
 
       var noLines = Number(this.orderDetails.length)
       for (let i = 0; i < noLines; i++) {
-
-
-      //   // get record information from Map
-      //   // DEVTODO - need to get by SKU
-      //   // let rec = this.forecastMap.get(this.lines[i].RecID)
-
-        // Don't set the quantity go negative
+      
+        // Don't let the quantity go negative
         if (Number(this.orderDetails[i].Bunches) < 0 ) {
           this.orderDetails[i].Bunches = 0
         }
 
         // Only need to refresh line if a variety is selected
-        if (this.orderDetails[i].SKU != "") {
-          
-          // DEVTODO - Get the price from forecastMap for selected item
-          // this.orderDetails[i].Price = rec["Price per Bunch"]
+        if (this.orderDetails[i].SKU.length > 0) {
+
+          console.log("SKU exists")
+          console.log(this.orderDetails[i].SKU)
+          let forecastRec = this.forecastMap.get(this.orderDetails[i].SKU)
+
+console.log(forecastRec)
+
+          this.orderDetails[i]["Price per Bunch"] = forecastRec["Price per Bunch"]
+          this.orderDetails[i].Variety = forecastRec.Variety
+          this.orderDetails[i].Crop = forecastRec.Crop
 
           // Extend the price
-          let extended = Number(this.orderDetails[i].Price) * Number(this.orderDetails[i].Bunches)
+          let extended = Number(this.orderDetails[i]["Price per Bunch"]) * Number(this.orderDetails[i].Bunches)
           this.orderDetails[i].Extended = Number(extended).toFixed(2)
 
           orderTotal = orderTotal + extended
@@ -206,10 +204,9 @@ export default {
   // Create map from array
   updated(){                                                                     
 
-    //DEVTODO - this needs to be keyed on SKU, 
     if (this.forecastMap.size == 0) {
       for (let i = 0; i < this.forecastRecords.length; i++) {
-        this.forecastMap.set(this.forecastRecords[i].RecID,this.forecastRecords[i])
+        this.forecastMap.set(this.forecastRecords[i].SKU,this.forecastRecords[i])
       }
     }
 
