@@ -211,14 +211,60 @@ export default {
       }
       this.orderTotal = Number(orderTotal).toFixed(2)
     },
+    ///////////////////////////////////////////////////////////////////////////////////
+    //
+    //                      Save Order
+    //
+    ///////////////////////////////////////////////////////////////////////////////////
     saveOrder(){
-      //DEVTODO - save to airtable
-      console.log("SAVE ORDER")
-      console.log(this.order)
-      console.log(this.orderDetails)
+
+console.log(this.order)
+
+      var Airtable = require('airtable');
+      Airtable.configure({
+          endpointUrl: 'https://api.airtable.com',
+          apiKey: this.$auth.user['https://app.madriverfloralcollective.com/airtable'] 
+      });
+      var base = Airtable.base('apptDZu7d1mrDMIFp'); //MRFC
+      
+      // DEVTODO - complete this record
+      var atOrder = {
+        "Notes": this.order.Notes,
+        "Account": this.order.Account,
+        "Client/Job": this.order['Client/Job'],
+        "Team Member": this.order['Team Member'],
+        "Due Date": this.order['Due Date']
+      }
+
+      // base('Order')
+      // .update(this.order.RecID, atOrder, function(err, record) {
+      //   if (err) {
+      //     console.error(err);
+      //     return;
+      //   }
+      //   console.log(record.get('Notes'));
+      // });
+
+      base('Order')
+      .update(this.order.RecID, atOrder)
+      .then( record => {
+        // DEVTODO - how do I NOT use record?
+        console.log(record)
+
+        // Go back to the Order List
+        this.$router.push({ path: '/order' })
+      })
+      .catch( err => {
+        console.log(err)
+      })
+
+
+ 
     }
 
   },
+
+
   // Create map from array
   updated(){                                                                     
 

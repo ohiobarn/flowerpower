@@ -80,6 +80,8 @@ export default {
 
     },
 
+
+
     getForecastRecords() {
       //
       // Array to hold query records
