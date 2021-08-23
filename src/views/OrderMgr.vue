@@ -3,7 +3,7 @@
     <br>
     <h3>Order Manager</h3>
     <br>
-    <router-link class="btn btn-primary" :to="{name: 'OrderEdit', params: {RecID: 'new'}}">New Order</router-link>
+    <button type="button" class="btn btn-primary" v-on:click="createOrder" >Create Order</button>
     <br>&nbsp;
     <OrderList :orders="orders" />
   </div>
@@ -28,6 +28,9 @@ export default {
   },
 
   methods: {
+    ////////////////////////////////////////////////////////////////////////////
+    //          Get Orders
+    ////////////////////////////////////////////////////////////////////////////
     getOrders() {
       //
       // Array to hold query records
@@ -69,7 +72,33 @@ export default {
       //
       this.orders = orders
 
+    },
+    ////////////////////////////////////////////////////////////////////////////
+    //          Create Order
+    ////////////////////////////////////////////////////////////////////////////
+    createOrder(){
+      var Airtable = require('airtable');
+      Airtable.configure({
+          endpointUrl: 'https://api.airtable.com',
+          apiKey: this.$auth.user['https://app.madriverfloralcollective.com/airtable'] 
+      });
+      var base = Airtable.base('apptDZu7d1mrDMIFp'); //MRFC
+
+      base('Order')
+      .create({
+        "Account": this.$auth.user.email,
+        "Team Member": this.$auth.user.name
+      })
+      .then( record => {
+        // Go to Order Edit
+        this.$router.push({ path: '/order/edit/' + record.getId()})
+      })
+      .catch( err => {
+        console.log(err)
+      })
+
     }
+
   }
 }
 </script>

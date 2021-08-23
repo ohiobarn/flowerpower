@@ -32,7 +32,7 @@ export default {
     getOrder(){
 
       var orderDetails = []
-      var account = this.$auth.user.email
+      // var account = this.$auth.user.email
 
       var Airtable = require('airtable');
       Airtable.configure({
@@ -40,6 +40,7 @@ export default {
           apiKey: this.$auth.user['https://app.madriverfloralcollective.com/airtable'] 
       });
       var base = Airtable.base('apptDZu7d1mrDMIFp'); //MRFC
+
       base('Order').find(this.RecID)
       .then( record => {
         this.order = record.fields
@@ -50,7 +51,9 @@ export default {
         base('OrderDetail').select({
           pageSize: 25,
           view: "fp-grid",
-          filterByFormula: 'Account = "' + account + '"'
+          // filterByFormula: 'Account = "' + account + '"',
+          filterByFormula: 'OrderRecID = "' + record.id + '"'
+
         }).eachPage(function page(records, fetchNextPage) {
             // This function (`page`) will get called for each page of records.
 

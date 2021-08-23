@@ -218,8 +218,6 @@ export default {
     ///////////////////////////////////////////////////////////////////////////////////
     saveOrder(){
 
-console.log(this.order)
-
       var Airtable = require('airtable');
       Airtable.configure({
           endpointUrl: 'https://api.airtable.com',
@@ -227,7 +225,6 @@ console.log(this.order)
       });
       var base = Airtable.base('apptDZu7d1mrDMIFp'); //MRFC
       
-      // DEVTODO - complete this record
       var atOrder = {
         "Notes": this.order.Notes,
         "Account": this.order.Account,
