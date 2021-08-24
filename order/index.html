@@ -129,23 +129,30 @@
 <article class="md-content__inner md-typeset">
 <h1 id="orders">Orders</h1>
 <p>The Order lifecycle is intended to facilitate communication between the collectives and its members form early planning to fulfillment.</p>
-<div class="mermaid">graph TB
-  start([Start]) 
-  -- Create Order --&gt; draft(Draft&lt;br&gt;Order)
-  -- Submit Order --&gt; req(Requested&lt;br&gt;Order)
-  -- MRFC Acknowledge --&gt; pending(Pending&lt;br&gt;Order)
-  -- MRFC Mark As Settled --&gt; settled(Settled&lt;br&gt;Order)
-  -- MRFC Mark As Fulfield --&gt; fulfield(Fulfield&lt;br&gt;Order)
-  -- MRFC Mark As Invoiced or Paid --&gt; archived(Archived&lt;br&gt;Order)
+<div class="mermaid">flowchart TD;
 
-  draft -- Cancel Order --&gt; stop1([End])
-  req -- Edit Order --&gt; req
-  pending -- Edit Order --&gt; pending
-  pending -- MFRC Edit Order --&gt; pending
-  pending -- Cancel Order --&gt; stop2([End])
-  settled -- View --&gt; settled
-  fulfield -- View --&gt; fulfield
-  archived -- View via Order History --&gt; archived
+  subgraph Draft-Phase;
+    start(["fa:fa-play-circle Start"]) 
+    -- Create Order --&gt; draft("fa:fa-drafting-compass Draft&lt;br&gt;Order")
+    -- Submit Order --&gt; req(Requested&lt;br&gt;Order)
+  end
+
+  subgraph Negotiation-Phase;
+    req -- MRFC Acknowledge --&gt; pending(Pending&lt;br&gt;Order)
+  end
+
+  subgraph Fulfillment-Phase;
+    pending
+    -- MRFC Mark As Settled --&gt; settled(Settled&lt;br&gt;Order)
+    -- MRFC Mark As Fulfilled --&gt; Fulfilled(Fulfilled&lt;br&gt;Order)
+    -- MRFC Mark As Invoiced or Paid --&gt; archived(Archived&lt;br&gt;Order)
+  end
+
+note1[/Modify order untill it is just right&lt;br&gt;Orders can stay in this phase for as longe as needed/] -.-&gt; Draft-Phase
+
+note2[/Work with MRFC to finalize the order&lt;br&gt;Additional edits may be required/] -.-&gt; Negotiation-Phase
+
+note3[/No edits can be made during this phase the&lt;br&gt;order is in view only mode. Once archived &lt;br&gt;the order will no longer display in your active order &lt;br&gt;list but can be view via Order History/] -.-&gt; Fulfillment-Phase
 
 </div>
 </article>
