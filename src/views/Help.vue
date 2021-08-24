@@ -1,7 +1,12 @@
 <template>
   <div id="most-outter">
-    <br>
-    <h1>This is the help page</h1>
+      <iframe
+        src="http://127.0.0.1:8000"
+        frameborder="0"
+        onmousewheel=""
+        width="100%"
+        height="800"
+      ></iframe>
   </div>
 </template>
 
