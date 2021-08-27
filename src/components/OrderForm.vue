@@ -147,8 +147,6 @@
       </div>
 
 
-      
-
     </form>
     <br />
     <br />
@@ -157,20 +155,24 @@
 </template>
 
 <script>
+
 export default {
   props: {
-    order: Object,
-    orderDetails: [],
-    forecastRecords: []
+
+    RecID: String
   },
   data(){
     
     return {
      orderTotal: 0,
-     forecastMap: new Map()
+     order: Object,
+     orderDetails: [],
+     forecastRecords: [],
+     forecastMap: new Map(),
     }
     
   },
+
   methods: {
     onChangeVariety() {
       this.refreshLines() 
@@ -178,6 +180,10 @@ export default {
     onChangeQuantity() {
       this.refreshLines()
     },
+
+    //
+    // refresh line
+    //
     refreshLines(){
       let orderTotal = 0
 
@@ -199,7 +205,6 @@ export default {
           this.orderDetails[i].Color = forecastRec.Color
           this.orderDetails[i]["Price per Bunch"] = forecastRec["Price per Bunch"]
           
-
           // Extend the price
           let extended = Number(this.orderDetails[i]["Price per Bunch"]) * Number(this.orderDetails[i].Bunches)
           this.orderDetails[i].Extended = Number(extended).toFixed(2)
@@ -209,13 +214,13 @@ export default {
         
          
       }
+
       this.orderTotal = Number(orderTotal).toFixed(2)
     },
-    ///////////////////////////////////////////////////////////////////////////////////
+
     //
-    //                      Save Order
+    // Save order to AirTable
     //
-    ///////////////////////////////////////////////////////////////////////////////////
     saveOrder(){
 
       var Airtable = require('airtable');
@@ -232,21 +237,14 @@ export default {
         "Team Member": this.order['Team Member'],
         "Due Date": this.order['Due Date']
       }
-
-      // base('Order')
-      // .update(this.order.RecID, atOrder, function(err, record) {
-      //   if (err) {
-      //     console.error(err);
-      //     return;
-      //   }
-      //   console.log(record.get('Notes'));
-      // });
-
       base('Order')
       .update(this.order.RecID, atOrder)
       .then( record => {
         // DEVTODO - how do I NOT use record?
         console.log(record)
+
+        // Update Order Detail
+        this.saveOrderDetail()
 
         // Go back to the Order List
         this.$router.push({ path: '/order' })
@@ -257,20 +255,218 @@ export default {
 
 
  
-    }
+    },
 
-  },
+    //
+    // Save Order Detail to AirTable
+    //
+    saveOrderDetail(){
+
+      var Airtable = require('airtable');
+      Airtable.configure({
+          endpointUrl: 'https://api.airtable.com',
+          apiKey: this.$auth.user['https://app.madriverfloralcollective.com/airtable'] 
+      });
+      var base = Airtable.base('apptDZu7d1mrDMIFp'); //MRFC
+
+      //
+      // Loop through detail and if Bunches is > 0 then
+      // add or update the OrderDetail
+      //
+      for (let i = 0; i < this.orderDetails.length; i++) {
+        if (this.orderDetails[i].Bunches > 3){
 
 
-  // Create map from array
-  updated(){                                                                     
+          let detail = {
+            // id: this.orderDetails[i].RecID,
+            // RecID: this.orderDetails[i].RecID, 
+            // Account: this.order.Account,
+            SKU: this.orderDetails[i].SKU, 
+            Crop: this.orderDetails[i].Crop,
+            Variety: this.orderDetails[i].Variety, 
+            Color: this.orderDetails[i].Color,
+            Bunches: this.orderDetails[i].Bunches,
+            "Price per Bunch": Number(this.orderDetails[i]["Price per Bunch"]),
+            "Stems per Bunch": Number(this.orderDetails[i]["Stems per Bunch"]),
+            Extended: Number(this.orderDetails[i].Extended)
+            // OrderRecID: [this.order.RecID]
+          }
 
-    if (this.forecastMap.size == 0) {
-      for (let i = 0; i < this.forecastRecords.length; i++) {
-        this.forecastMap.set(this.forecastRecords[i].SKU,this.forecastRecords[i])
+          if(this.orderDetails[i].RecID == ""){
+            //DEVTODO - handle adds
+          } else {
+            //update
+            base('OrderDetail').update(this.orderDetails[i].RecID, detail)
+            .then( record => {
+              console.log("updated record")
+              console.log(record)
+            })
+            .catch( err => {
+              console.log(err)
+            })
+
+          }
+        }
+
+      }
+
+    },
+
+    //
+    // Get order from AirTable
+    //
+    getOrder(){
+
+      var orderDetails = []
+      // var account = this.$auth.user.email
+
+      var Airtable = require('airtable');
+      Airtable.configure({
+          endpointUrl: 'https://api.airtable.com',
+          apiKey: this.$auth.user['https://app.madriverfloralcollective.com/airtable'] 
+      });
+      var base = Airtable.base('apptDZu7d1mrDMIFp'); //MRFC
+
+      base('Order').find(this.RecID)
+      .then( record => {
+        this.order = record.fields
+
+        ///////////////////////////////////////////////////////
+        // Get Order Detail
+        //////////////////////////////////////////////////////
+        base('OrderDetail').select({
+          pageSize: 25,
+          view: "fp-grid",
+          // filterByFormula: 'Account = "' + account + '"',
+          filterByFormula: 'OrderRecID = "' + record.id + '"'
+
+        }).eachPage(function page(records, fetchNextPage) {
+            // This function (`page`) will get called for each page of records.
+
+            records.forEach(function(record) {
+              var orderDetail = record.fields
+              orderDetails.push(orderDetail)
+            });
+
+            // To fetch the next page of records, call `fetchNextPage`.
+            // If there are more records, `page` will get called again.
+            // If there are no more records, `done` will get called.
+            fetchNextPage();
+
+        }, function done(err) {
+            if (err) { console.error(err); return; }
+        });
+
+        //
+        // Populate data
+        //
+        this.orderDetails = orderDetails
+
+      })
+      .catch( err => {
+        console.log(err)
+      })
+
+    },
+
+    //
+    // Get forecast records from AirTable
+    //
+    getForecastRecords() {
+      //
+      // Array to hold query records
+      //
+      var recs = []
+      var Airtable = require('airtable');
+      Airtable.configure({
+          endpointUrl: 'https://api.airtable.com',
+          apiKey: this.$auth.user['https://app.madriverfloralcollective.com/airtable'] 
+      });
+      var base = Airtable.base('apptDZu7d1mrDMIFp'); //MRFC
+      base('Forecast (MRFC)').select({
+          maxRecords: 999,
+          pageSize: 100,
+          view: "MRFC Grid Public"
+      }).eachPage(function page(records, fetchNextPage) {
+          
+          // This function (`page`) will get called for each page of records.
+          records.forEach(function(record) {
+              var rec = record.fields
+              recs.push(rec)
+          });
+
+          // To fetch the next page of records, call `fetchNextPage`.
+          // If there are more records, `page` will get called again.
+          // If there are no more records, `done` will get called.
+          fetchNextPage();
+
+      }, function done(err) {
+          if (err) { console.error(err); return; }
+      });
+
+      // DEVTODO - if multiple pages are needed I am not sure if this works
+      //           currently the number of forecast records is < 100
+
+      //
+      // Populate data
+      //
+      this.forecastRecords = recs
+
+    },
+
+    //
+    // Add one empty line for user to add new items
+    //
+    addBlankLine(){
+
+      let blankLine = {
+        RecID: "", 
+        Account: this.order.Account,
+        SKU: "", 
+        Crop: "",
+        Variety: "", 
+        Color: "",
+        Bunches: 0,
+        "Price per Bunch": 0,
+        "Stems per Bunch": 0, 
+        Extended: 0
+      }
+
+      //
+      // If orderDetails has elements then look a the last element
+      // and if the last element is not an "empty line" then add 
+      // and "empty line"
+      //
+      if (this.orderDetails.length > 0){
+        var last = Number(this.orderDetails.length - 1)
+        if (this.orderDetails[last].Bunches > 0 || this.orderDetails[last].SKU.length > 0){
+          this.orderDetails.push(blankLine)
+        }
+      }
+
+    },
+
+    //
+    // Populate forecastMap from array
+    //
+    populateForecastMap(){
+      if (this.forecastMap.size == 0) {
+        for (let i = 0; i < this.forecastRecords.length; i++) {
+          this.forecastMap.set(this.forecastRecords[i].SKU,this.forecastRecords[i])
+        }
       }
     }
 
+  },
+  mounted(){
+    this.getForecastRecords()
+    this.getOrder()
+  },
+  beforeUpdate() {
+    this.addBlankLine()
+  },
+  updated(){   
+    this.populateForecastMap()
   },
 
 
