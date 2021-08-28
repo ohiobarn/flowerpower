@@ -8,7 +8,7 @@ import Browse from "../views/Browse.vue"
 import OrderMgr from "../views/OrderMgr.vue"
 import OrderEdit from "../views/OrderEdit.vue"
 
-// import AirtableTest from '../views/AirtableTest.vue';
+import AirtableTest from '../views/AirtableTest.vue';
 
 Vue.use(VueRouter)
 
@@ -17,6 +17,12 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home
+  },
+  {
+    path: '/test',
+    name: 'AirtableTest',
+    component: AirtableTest,
+    beforeEnter: authGuard
   },
   {
     path: '/browse',

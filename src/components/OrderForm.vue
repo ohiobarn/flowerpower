@@ -223,44 +223,59 @@ export default {
     //
     saveOrder(){
 
+      //
+      // Save Order Detail to AirTable
+      //
+      const doDetail = () => {
+        // Update Order Detail
+        this.saveOrderDetail()
+
+        // Go back to the Order List
+        this.$router.push({ path: '/order' })
+      }
+ 
+      //
+      // Done
+      //
+      const done = (err) => {
+        if (err) { console.error(err); return; }
+      }
+
       var Airtable = require('airtable');
-      Airtable.configure({
+      var atConf = {
           endpointUrl: 'https://api.airtable.com',
           apiKey: this.$auth.user['https://app.madriverfloralcollective.com/airtable'] 
-      });
+      }
+
+      Airtable.configure(atConf);
       var base = Airtable.base('apptDZu7d1mrDMIFp'); //MRFC
       
-      var atOrder = {
+      var order = {
         "Notes": this.order.Notes,
         "Account": this.order.Account,
         "Client/Job": this.order['Client/Job'],
         "Team Member": this.order['Team Member'],
         "Due Date": this.order['Due Date']
       }
+
       base('Order')
-      .update(this.order.RecID, atOrder)
-      .then( record => {
-        // DEVTODO - how do I NOT use record?
-        console.log(record)
+      .update(this.order.RecID, order)
+      .then(doDetail)
+      .catch(done)
 
-        // Update Order Detail
-        this.saveOrderDetail()
-
-        // Go back to the Order List
-        this.$router.push({ path: '/order' })
-      })
-      .catch( err => {
-        console.log(err)
-      })
-
-
- 
     },
 
     //
     // Save Order Detail to AirTable
     //
     saveOrderDetail(){
+
+      //
+      // Done
+      //
+      const done = (err) => {
+          if (err) { console.error(err); return; }
+      }
 
       var Airtable = require('airtable');
       Airtable.configure({
@@ -274,40 +289,48 @@ export default {
       // add or update the OrderDetail
       //
       for (let i = 0; i < this.orderDetails.length; i++) {
-        if (this.orderDetails[i].Bunches > 3){
+ 
+        // if (this.orderDetails[i].SKU.length > 0) {
 
 
           let detail = {
-            // id: this.orderDetails[i].RecID,
-            // RecID: this.orderDetails[i].RecID, 
-            // Account: this.order.Account,
+            Account: this.order.Account, 
             SKU: this.orderDetails[i].SKU, 
             Crop: this.orderDetails[i].Crop,
             Variety: this.orderDetails[i].Variety, 
             Color: this.orderDetails[i].Color,
-            Bunches: this.orderDetails[i].Bunches,
+            Bunches: Number(this.orderDetails[i].Bunches),
             "Price per Bunch": Number(this.orderDetails[i]["Price per Bunch"]),
             "Stems per Bunch": Number(this.orderDetails[i]["Stems per Bunch"]),
-            Extended: Number(this.orderDetails[i].Extended)
-            // OrderRecID: [this.order.RecID]
+            Extended: Number(this.orderDetails[i].Extended),
+            OrderRecID: [this.order.RecID]
           }
 
-          if(this.orderDetails[i].RecID == ""){
-            //DEVTODO - handle adds
-          } else {
-            //update
-            base('OrderDetail').update(this.orderDetails[i].RecID, detail)
-            .then( record => {
-              console.log("updated record")
-              console.log(record)
-            })
-            .catch( err => {
-              console.log(err)
-            })
-
+          // If New and SKU and Bunches specified then create
+          if(this.orderDetails[i].isNew && this.orderDetails[i].SKU.length > 0 && this.orderDetails[i].Bunches > 0 ){
+            base('OrderDetail').create(detail).catch(done)
           }
-        }
 
+          // If existing and SKU and Bunches specified then update
+          else if (!this.orderDetails[i].isNew && this.orderDetails[i].SKU.length > 0 && this.orderDetails[i].Bunches > 0){
+            base('OrderDetail').update(this.orderDetails[i].RecID, detail).catch(done)
+          } 
+
+          // If existing and SKU is blank then delete
+          else if (!this.orderDetails[i].isNew && this.orderDetails[i].SKU.length == 0){
+            base('OrderDetail').destroy(this.orderDetails[i].RecID).catch(done)
+          }
+
+          // If existing and Bunches = 0 then delete
+          else if (!this.orderDetails[i].isNew && this.orderDetails[i].Bunches == 0){
+            base('OrderDetail').destroy(this.orderDetails[i].RecID).catch(done)
+          } 
+
+          else {
+            console.log("No action taken?")
+          }
+
+        // }
       }
 
     },
@@ -317,77 +340,103 @@ export default {
     //
     getOrder(){
 
-      var orderDetails = []
-      // var account = this.$auth.user.email
+      //
+      // Get Order Detail from AirTable
+      //
+      const getOrderDetail = (record) => {
 
-      var Airtable = require('airtable');
-      Airtable.configure({
-          endpointUrl: 'https://api.airtable.com',
-          apiKey: this.$auth.user['https://app.madriverfloralcollective.com/airtable'] 
-      });
-      var base = Airtable.base('apptDZu7d1mrDMIFp'); //MRFC
-
-      base('Order').find(this.RecID)
-      .then( record => {
+        // Order Header
         this.order = record.fields
 
-        ///////////////////////////////////////////////////////
         // Get Order Detail
-        //////////////////////////////////////////////////////
-        base('OrderDetail').select({
+        var selectRecord = {
           pageSize: 25,
           view: "fp-grid",
           // filterByFormula: 'Account = "' + account + '"',
           filterByFormula: 'OrderRecID = "' + record.id + '"'
 
-        }).eachPage(function page(records, fetchNextPage) {
-            // This function (`page`) will get called for each page of records.
+        }
 
-            records.forEach(function(record) {
-              var orderDetail = record.fields
-              orderDetails.push(orderDetail)
-            });
+        base('OrderDetail')
+        .select(selectRecord)
+        .eachPage(page, orderDetailDone);
 
-            // To fetch the next page of records, call `fetchNextPage`.
-            // If there are more records, `page` will get called again.
-            // If there are no more records, `done` will get called.
-            fetchNextPage();
-
-        }, function done(err) {
-            if (err) { console.error(err); return; }
-        });
-
-        //
-        // Populate data
-        //
+        // Populate model
         this.orderDetails = orderDetails
 
-      })
-      .catch( err => {
-        console.log(err)
-      })
+
+
+      }
+
+
+      //
+      // Page
+      //
+      const page = (records, fetchNextPage) => {
+          // This function (`page`) will get called for each page of records.
+
+          records.forEach(function(record) {
+            var orderDetail = record.fields
+            orderDetails.push(orderDetail)
+          });
+
+          // To fetch the next page of records, call `fetchNextPage`.
+          // If there are more records, `page` will get called again.
+          // If there are no more records, `done` will get called.
+          fetchNextPage();
+
+      }
+
+      //
+      // Done
+      //
+      const done = (err) => {
+          if (err) { console.error(err); return; }
+      }
+
+      // Done
+      //
+      const orderDetailDone = (err) => {
+          if (err) { 
+            console.error(err); 
+            return; 
+
+          } else {
+            // Add blank line even if list is empty
+            this.addBlankLine(true)
+          }
+      }
+
+
+      var orderDetails = []
+      // var account = this.$auth.user.email
+
+      var Airtable = require('airtable');
+      var atConf = {
+          endpointUrl: 'https://api.airtable.com',
+          apiKey: this.$auth.user['https://app.madriverfloralcollective.com/airtable'] 
+      }
+      Airtable.configure(atConf);
+      var base = Airtable.base('apptDZu7d1mrDMIFp'); //MRFC
+
+      base('Order')
+      .find(this.RecID)
+      .then(getOrderDetail)
+      .catch(done)
 
     },
+    
+
 
     //
     // Get forecast records from AirTable
     //
     getForecastRecords() {
+
       //
-      // Array to hold query records
+      // Page
       //
-      var recs = []
-      var Airtable = require('airtable');
-      Airtable.configure({
-          endpointUrl: 'https://api.airtable.com',
-          apiKey: this.$auth.user['https://app.madriverfloralcollective.com/airtable'] 
-      });
-      var base = Airtable.base('apptDZu7d1mrDMIFp'); //MRFC
-      base('Forecast (MRFC)').select({
-          maxRecords: 999,
-          pageSize: 100,
-          view: "MRFC Grid Public"
-      }).eachPage(function page(records, fetchNextPage) {
+      const page = (records, fetchNextPage) => {
           
           // This function (`page`) will get called for each page of records.
           records.forEach(function(record) {
@@ -400,16 +449,35 @@ export default {
           // If there are no more records, `done` will get called.
           fetchNextPage();
 
-      }, function done(err) {
-          if (err) { console.error(err); return; }
-      });
-
-      // DEVTODO - if multiple pages are needed I am not sure if this works
-      //           currently the number of forecast records is < 100
+      }
 
       //
-      // Populate data
+      // Done
       //
+      const done= (err) => {
+        if (err) { console.error(err); return; }
+      }
+
+      var recs = []
+      var Airtable = require('airtable');
+      var atConf = {
+          endpointUrl: 'https://api.airtable.com',
+          apiKey: this.$auth.user['https://app.madriverfloralcollective.com/airtable'] 
+      }
+
+      Airtable.configure(atConf);
+      var base = Airtable.base('apptDZu7d1mrDMIFp'); //MRFC
+      var selConf = {
+          // maxRecords: 999,
+          pageSize: 100,
+          view: "MRFC Grid Public"
+      }
+
+      base('Forecast (MRFC)')
+      .select(selConf)
+      .eachPage(page,done);
+
+      // Populate model
       this.forecastRecords = recs
 
     },
@@ -417,9 +485,10 @@ export default {
     //
     // Add one empty line for user to add new items
     //
-    addBlankLine(){
+    addBlankLine(addIfEmpty){
 
       let blankLine = {
+        isNew: true,
         RecID: "", 
         Account: this.order.Account,
         SKU: "", 
@@ -444,6 +513,14 @@ export default {
         }
       }
 
+      //
+      // This is used on initial load of db but not 
+      // during the order edit phase
+      if (this.orderDetails.length == 0 && addIfEmpty){
+          this.orderDetails.push(blankLine)
+      }
+      
+
     },
 
     //
@@ -463,10 +540,11 @@ export default {
     this.getOrder()
   },
   beforeUpdate() {
-    this.addBlankLine()
+    
   },
   updated(){   
     this.populateForecastMap()
+    this.addBlankLine(false)
   },
 
 

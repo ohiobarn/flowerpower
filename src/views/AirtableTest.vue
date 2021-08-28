@@ -41,38 +41,44 @@ export default {
   },
 
   mounted(){
-    //
-    // Array to hold query records
-    //
-    var recs = []
 
-    var Airtable = require('airtable');
-    Airtable.configure({
-        endpointUrl: 'https://api.airtable.com',
-        apiKey: this.$auth.user['https://app.madriverfloralcollective.com/airtable'] 
-    });
-    var base = Airtable.base('apptDZu7d1mrDMIFp'); //MRFC
+    const done = (err) => {
+      if (err) { console.error(err); return; }
+    }
 
-    base('Forecast (MRFC)').select({
-        // maxRecords: 999,
-        pageSize: 25,
-        view: "MRFC Grid Public"
-    }).eachPage(function page(records, fetchNextPage) {
+    const page = (records, fetchNextPage) => {
         // This function (`page`) will get called for each page of records.
 
         records.forEach(function(record) {
             var rec = record.fields
             recs.push(rec)
+            // this.forecastRecords.push(rec)
         });
 
         // To fetch the next page of records, call `fetchNextPage`.
         // If there are more records, `page` will get called again.
         // If there are no more records, `done` will get called.
         fetchNextPage();
+    }
 
-    }, function done(err) {
-        if (err) { console.error(err); return; }
-    });
+    //
+    // Array to hold query records
+    //
+    var recs = []
+
+    var Airtable = require('airtable');
+    var airConf = {
+        endpointUrl: 'https://api.airtable.com',
+        apiKey: this.$auth.user['https://app.madriverfloralcollective.com/airtable'] 
+    }
+    Airtable.configure(airConf);
+    var base = Airtable.base('apptDZu7d1mrDMIFp'); //MRFC
+    var selConf = {
+        // maxRecords: 999,
+        pageSize: 100,
+        view: "MRFC Grid Public"
+    }
+    base('Forecast (MRFC)').select(selConf).eachPage(page,done);
 
     //
     // Populate data
@@ -80,7 +86,6 @@ export default {
     this.forecastRecords = recs
 
   }
-
 
 }
 </script>
