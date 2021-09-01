@@ -103,9 +103,31 @@
 </li>
 <li class="md-nav__item md-nav__item--active">
 <input class="md-nav__toggle md-toggle" data-md-toggle="toc" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+          Orders
+          <span class="md-nav__icon md-icon"></span>
+</label>
 <a class="md-nav__link md-nav__link--active" href="./">
         Orders
       </a>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#order-status">
+    Order Status
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#order-status-flow">
+    Order Status Flow
+  </a>
+</li>
+</ul>
+</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../about/">
@@ -121,6 +143,22 @@
 <div class="md-sidebar__scrollwrap">
 <div class="md-sidebar__inner">
 <nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#order-status">
+    Order Status
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#order-status-flow">
+    Order Status Flow
+  </a>
+</li>
+</ul>
 </nav>
 </div>
 </div>
@@ -129,28 +167,34 @@
 <article class="md-content__inner md-typeset">
 <h1 id="orders">Orders</h1>
 <p>The Order lifecycle is intended to facilitate communication between the collectives and its members form early planning to fulfillment.</p>
+<h2 id="order-status">Order Status</h2>
+<div class="mermaid">flowchart LR;
+
+draft(Draft) --&gt; submit(Submitted) --&gt; pending(Pending) --&gt; settled(Settled) --&gt; fulfilled(Fulfilled) --&gt; archived(Archived)
+</div>
+<h2 id="order-status-flow">Order Status Flow</h2>
 <div class="mermaid">flowchart TD;
 
   subgraph Draft-Phase;
-    start(["fa:fa-play-circle Start"]) 
-    -- Create Order --&gt; draft("fa:fa-drafting-compass Draft&lt;br&gt;Order")
-    -- Submit Order --&gt; req(Requested&lt;br&gt;Order)
+    start(["Start"]) 
+    -- Create Order --&gt; draft("Draft&lt;br&gt;Order")
+    -- Submit Order --&gt; submit(Submitted&lt;br&gt;Order)
   end
 
-  subgraph Negotiation-Phase;
-    req -- MRFC Acknowledge --&gt; pending(Pending&lt;br&gt;Order)
+  subgraph Collaboration-Phase;
+    submit -- MRFC Acknowledge --&gt; pending(Pending&lt;br&gt;Order)
   end
 
   subgraph Fulfillment-Phase;
     pending
     -- MRFC Mark As Settled --&gt; settled(Settled&lt;br&gt;Order)
-    -- MRFC Mark As Fulfilled --&gt; Fulfilled(Fulfilled&lt;br&gt;Order)
+    -- MRFC Mark As Fulfilled --&gt; fulfilled(Fulfilled&lt;br&gt;Order)
     -- MRFC Mark As Invoiced or Paid --&gt; archived(Archived&lt;br&gt;Order)
   end
 
 note1[/Modify order untill it is just right&lt;br&gt;Orders can stay in this phase for as longe as needed/] -.-&gt; Draft-Phase
 
-note2[/Work with MRFC to finalize the order&lt;br&gt;Additional edits may be required/] -.-&gt; Negotiation-Phase
+note2[/Work with MRFC to finalize the order&lt;br&gt;Additional edits may be required/] -.-&gt; Collaboration-Phase
 
 note3[/No edits can be made during this phase the&lt;br&gt;order is in view only mode. Once archived &lt;br&gt;the order will no longer display in your active order &lt;br&gt;list but can be view via Order History/] -.-&gt; Fulfillment-Phase
 
