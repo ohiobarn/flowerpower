@@ -164,15 +164,78 @@
 
         
       <hr>
+      <!-- prototype order detial layout -->
+      <ul class="pl-0">
+        <li class="orderDetailList" v-for="(detail, index ) in orderDetails" :key="index">
+          <div class="lineItem">
+            
+            <div class="top-row d-flex flex-row justify-content-between align-items-start">
+              <span class="lead">{{detail.Crop}}</span> <i class="color-dot fas fa-circle" style="color:#F4C9C9"></i>
+            </div>
+            
+            <div class="middle-row my-2 d-flex flex-row justify-content-around">
+              <span><strong> {{detail.Variety}} </strong></span> 
+            </div>
+            
+            <div class="label-row text-muted d-flex flex-row justify-content-between align-items-center">
+              <small class="sku">SKU</small> <small class="bunches">BUNCHES</small> <small class="extended">EXTENDED</small> 
+            </div>
+            
+            <div class="bottom-row d-flex flex-row justify-content-between align-items-center">
+              <small class="sku">{{detail.SKU}}</small> <span class="bunches">{{detail.Bunches}} x ${{detail["Price per Bunch"]}}</span> <span class="extended">${{detail.Extended}}</span> 
+            </div>
+          
+          </div>
+        </li>
+      </ul>
 
-      <div class="form-row">
-        <div class="col">
-            <button type="button" class="btn btn-primary" v-on:click="saveOrder" >Save</button>  
+      <div>
+
+        <ul class="d-flex flex-row justify-content-around">
+          <li v-for="swatch in colorOptions" :key="swatch">
+            <i class="color-dot fas fa-circle" :style="{color:swatch}"></i>
+          </li>
+        </ul>
+
+        <form class="search d-flex flex-row align-items-center " @submit.prevent="searchForecast" >
+          
+          <input id="searchBar" type="text" class="form-control" v-model="searchTerm" placeholder="Search Forecast">
+
+          <div id="priceFilter">
+            <i class="fas fa-angle-up"></i>
+            <div>{{priceRange}}</div>
+            <i class="fas fa-angle-down"></i>
+          </div>
+        </form>
+
+        <div>
+          <ul class="d-flex flex-row flex-wrap mt-1">
+            <li v-for="(term, i) in searchCriteria" :key="i" class="mx-1">
+              <span class="badge rounded-pill">{{term}}<i class="far fa-times-circle ml-1" @click="removeSearchTerm(term)"></i> </span> 
+            </li>
+          </ul>
+          <ul>
+            <li v-for="(rec, i) in searchResults" :key="i" class="my-1 d-flex flex-row no-wrap justify-content-between align-items-center">
+              <div>
+                <p v-if='rec["Stems per Bunch"] != 10'>{{ rec.Crop }}, {{ rec.Variety }} {{rec.Color}} ({{ rec["SKU #"] }}), ${{rec["Price per Bunch"] }}/bu @ {{ rec["Stems per Bunch"] }} spb</p>
+                <p v-else>{{ rec.Crop }}, {{ rec.Variety }}, {{rec.Color}} ({{ rec["SKU #"] }}), ${{rec["Price per Bunch"] }}/bu</p>
+              </div>
+              <div>
+                <i class="far fa-plus-square ml-1" @click="addToOrder(rec)"></i>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="form-row ">
+        <div class="col d-flex flex-row justify-content-center">
+            <button type="button" class="btn-primary-custom" v-on:click="saveOrder" >Save</button>  
         </div>
         <!-- <div class="col">
             <p></p>
         </div> -->
-        <div class="col">
+        <div class="col d-flex flex-row justify-content-center">
           <router-link to="/order" class="btn btn-secondary">Cancel</router-link> 
         </div>        
       </div>
@@ -189,7 +252,6 @@
 
 export default {
   props: {
-
     RecID: String
   },
   data(){
@@ -200,18 +262,87 @@ export default {
      orderDetails: [],
      forecastRecords: [],
      forecastMap: new Map(),
+     searchTerm: '',
+     searchCriteria: [],
+     searchResults: [],
+     colorOptions: ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'],
+     priceRange: '$'
     }
     
   },
 
   methods: {
+    searchForecast(){
+      this.searchCriteria.push(this.searchTerm)
+
+      this.updateForecastSearch()
+
+      this.searchTerm = ''
+    },
+    updateForecastSearch(){
+
+      if (this.searchCriteria.length === 0) {
+        this.searchResults = []
+      }
+
+      this.searchCriteria.forEach(term => {
+        this.filterByTerm(term)
+      })
+
+    },
+    filterByTerm(term){
+      let forecastList
+      
+      if (this.searchCriteria.length === 1) {
+        forecastList = this.forecastRecords
+      }
+      else{
+        forecastList = this.searchResults
+      }
+      
+      let narrowedList = []
+
+      forecastList.forEach(rec => {
+        
+        if (rec.Crop.toLowerCase().includes(term.toLowerCase())) {
+          
+          narrowedList.push(rec)
+        }
+
+        if (rec.Variety.toLowerCase().includes(term.toLowerCase())) {
+          
+          narrowedList.push(rec)
+        }
+
+        if (rec.Color.toLowerCase().includes(term.toLowerCase())) {
+          
+          narrowedList.push(rec)
+        }
+
+      })
+
+      this.searchResults = narrowedList
+    },
+    removeSearchTerm(term){
+
+      this.searchCriteria = this.searchCriteria.filter(t => t !==term)
+
+      this.updateForecastSearch()
+    },
+    addToOrder(rec){
+      console.log(rec)
+
+      rec.Bunches = 1
+      let extended = Number(rec["Price per Bunch"]) * Number(rec.Bunches)
+      rec.Extended = extended
+      this.orderDetails.push(rec)
+    },
     onChangeVariety() {
       this.refreshLines() 
     },
     onChangeQuantity() {
       this.refreshLines()
     },
-
     //
     // refresh line
     //
@@ -242,13 +373,10 @@ export default {
 
           orderTotal = orderTotal + extended
         }
-        
-         
       }
 
       this.orderTotal = Number(orderTotal).toFixed(2)
     },
-
     //
     // Save order to AirTable
     //
@@ -295,7 +423,6 @@ export default {
       .catch(done)
 
     },
-
     //
     // Save Order Detail to AirTable
     //
@@ -365,7 +492,6 @@ export default {
       }
 
     },
-
     //
     // Get order from AirTable
     //
@@ -456,9 +582,6 @@ export default {
       .catch(done)
 
     },
-    
-
-
     //
     // Get forecast records from AirTable
     //
@@ -582,5 +705,70 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+
+/* possible button styling instead of bootstrap's primary */
+.btn-primary-custom {
+  background-color: #F4C9C9;
+  border: 1px solid transparent;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: .25rem;
+}
+
+#priceFilter{
+  display: flex;
+  flex-flow: column nowrap;
+  color: grey;
+  margin-left: 1em;
+  margin-right: 1em;
+
+}
+
+span.badge{
+  background-color: #F4C9C9;
+}
+
+.lineItem{
+  border: solid 2px lightgray;
+  border-radius: .25em;
+  margin: 0.5em 0;
+  padding: 0.5em 0.5em;
+}
+
+i.color-dot{
+  border-radius: 50%;
+}
+
+li{
+  list-style-type: none;
+}
+
+ul{
+  padding-left: 0;
+}
+
+small.sku {
+  width: 100px;
+  display: inline-block;
+  text-align: center;
+}
+
+.bunches{
+  width: 125px;
+  display: inline-block;
+  text-align: center;
+}
+
+.extended{
+  width: 125px;
+  display: inline-block;
+  text-align: center;
+}
+
+p{
+  margin-bottom: 0;
+}
+
 </style>
