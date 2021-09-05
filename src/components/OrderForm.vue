@@ -1,9 +1,11 @@
 <template>
   <div>
-    <h3>Order No. {{ order.OrderNo }}</h3>
+    <h3>Order No. {{ order.OrderNo }} - <i>{{ order.Status }}</i> <button type="button" class="btn btn-primary">Submit Order</button></h3>
+    <br>
 
     <form>
-      <hr />
+
+
       <div class="form-row">
         <div class="col">
           <div class="form-group">
