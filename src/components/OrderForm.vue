@@ -190,9 +190,9 @@
       </ul>
 
       <div>
-
+        <!-- Color Dots/Swatches -->
         <ul class="d-flex flex-row justify-content-around">
-          <li v-for="swatch in colorOptions" :key="swatch">
+          <li v-for="swatch in colorOptions" :key="swatch" @click="filterByColor(swatch)" :class="{inactiveSwatch: !searchCriteria.includes(swatch)}" >
             <i class="color-dot fas fa-circle" :style="{color:swatch}"></i>
           </li>
         </ul>
@@ -201,10 +201,10 @@
           
           <input id="searchBar" type="text" class="form-control" v-model="searchTerm" placeholder="Search Forecast">
 
-          <div id="priceFilter">
-            <i class="fas fa-angle-up"></i>
-            <div>{{priceRange}}</div>
-            <i class="fas fa-angle-down"></i>
+          <div id="priceFilter" class="d-flex flex-column align-items-center">
+            <i class="fas fa-angle-up" @click="increasePrice"></i>
+            <div style="width:3em; text-align:center">{{dollarSigns}}</div>
+            <i class="fas fa-angle-down" @click="decreasePrice"></i>
           </div>
         </form>
 
@@ -217,8 +217,8 @@
           <ul>
             <li v-for="(rec, i) in searchResults" :key="i" class="my-1 d-flex flex-row no-wrap justify-content-between align-items-center">
               <div>
-                <p v-if='rec["Stems per Bunch"] != 10'>{{ rec.Crop }}, {{ rec.Variety }} {{rec.Color}} ({{ rec["SKU #"] }}), ${{rec["Price per Bunch"] }}/bu @ {{ rec["Stems per Bunch"] }} spb</p>
-                <p v-else>{{ rec.Crop }}, {{ rec.Variety }}, {{rec.Color}} ({{ rec["SKU #"] }}), ${{rec["Price per Bunch"] }}/bu</p>
+                <p v-if='rec["Stems per Bunch"] != 10'>{{rec.Tier}}{{ rec.Crop }}, {{ rec.Variety }} {{rec.Color}} ({{ rec["SKU #"] }}), ${{rec["Price per Bunch"] }}/bu @ {{ rec["Stems per Bunch"] }} spb</p>
+                <p v-else>{{rec.Tier}} {{ rec.Crop }}, {{ rec.Variety }}, {{rec.Color}} ({{ rec["SKU #"] }}), ${{rec["Price per Bunch"] }}/bu</p>
               </div>
               <div>
                 <i class="far fa-plus-square ml-1" @click="addToOrder(rec)"></i>
@@ -266,12 +266,41 @@ export default {
      searchCriteria: [],
      searchResults: [],
      colorOptions: ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'],
-     priceRange: '$'
+     priceRange: 2
     }
     
   },
 
   methods: {
+    increasePrice(){
+      if (this.priceRange < 5) {
+        this.priceRange += 2
+        this.updateForecastSearch()
+      }
+    },
+    decreasePrice(){
+      if (this.priceRange > 2) {
+        this.priceRange -= 2
+        this.updateForecastSearch()
+      }
+    },
+    filterByColor(color){
+      if (this.searchCriteria.includes(color)) {
+        console.log('colord already selected')
+        
+        let index = this.searchCriteria.indexOf(color)
+        
+        this.searchCriteria.splice(index, 1)
+
+        this.updateForecastSearch()
+      }
+      else {
+        
+        this.searchTerm = color
+  
+        this.searchForecast()
+      }
+    },
     searchForecast(){
       this.searchCriteria.push(this.searchTerm)
 
@@ -318,10 +347,11 @@ export default {
           
           narrowedList.push(rec)
         }
-
       })
 
-      this.searchResults = narrowedList
+      this.searchResults = narrowedList.filter(r => {
+        return parseInt(r.Tier) <= this.priceRange
+      })
     },
     removeSearchTerm(term){
 
@@ -701,6 +731,27 @@ export default {
     this.addBlankLine(false)
   },
 
+  computed: {
+    dollarSigns(){
+      switch (this.priceRange) {
+        case 1:
+          return '$';
+        case 2:
+          return '$';
+        case 3:
+          return '$$';
+        case 4:
+          return '$$';
+        case 5:
+          return '$$$';
+        case 6:
+          return '$$$';
+        default:
+          return 'NA';
+      }
+    }
+  }
+
 
 }
 </script>
@@ -769,6 +820,10 @@ small.sku {
 
 p{
   margin-bottom: 0;
+}
+
+.inactiveSwatch{
+  opacity: 0.5;
 }
 
 </style>
