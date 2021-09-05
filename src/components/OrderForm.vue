@@ -193,7 +193,7 @@
         <!-- Color Dots/Swatches -->
         <ul class="d-flex flex-row justify-content-around">
           <li v-for="swatch in colorOptions" :key="swatch" @click="filterByColor(swatch)" :class="{inactiveSwatch: !searchCriteria.includes(swatch)}" >
-            <i class="color-dot fas fa-circle" :style="{color:swatch}"></i>
+            <i class="color-dot fas  fa-seedling" :style="{color:swatch}"></i>
           </li>
         </ul>
 
@@ -339,6 +339,11 @@ export default {
         }
 
         if (rec.Variety.toLowerCase().includes(term.toLowerCase())) {
+          
+          narrowedList.push(rec)
+        }
+
+        if (rec.SKU.toLowerCase().includes(term.toLowerCase())) {
           
           narrowedList.push(rec)
         }
