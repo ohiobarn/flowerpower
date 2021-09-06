@@ -1,7 +1,6 @@
 <template>
   <div>
     <h3>Order No. {{ order.OrderNo }}</h3>
-
     <form>
       <hr />
       <div class="form-row">
@@ -77,7 +76,7 @@
       <hr>
       <!-- prototype order detial layout -->
       <ul class="pl-0">
-        <li class="orderDetailList" v-for="(detail, index ) in orderDetails" :key="index">
+        <li v-for="(detail, index ) in orderDetails" :key="index">
           <div class="lineItem">
             
             <div class="top-row d-flex flex-row justify-content-between align-items-start">
@@ -99,11 +98,16 @@
           
           </div>
         </li>
+
+        <li id="addItemBtn" class="lineItem" v-if="!addingItem" @click="addingItem=!addingItem">
+          <h3 class="text-center">+</h3>
+        </li>
+
       </ul>
 
-      <div id="search-filter">
+      <div id="search-filter" v-if="addingItem" class="px-2 py-1">
         <!-- Color Dots/Swatches -->
-        <ul class="d-flex flex-row justify-content-around">
+        <ul class="d-flex flex-row justify-content-between mb-1">
           <li v-for="swatch in colorOptions" :key="swatch" >
             <input type="checkbox" :id="swatch" :value="swatch" class="mr-1" v-model="checkedColors">
             <label for="swatch">
@@ -140,45 +144,74 @@
               <option value="6">$$$</option>
             </select>
           </div>
-
         </form>
-          <div>
-            <button @click.prevent="resetSearch">Reset</button>
+
+          <!-- reset search button -->
+          <div class="d-flex flex-row justify-content-between align-items-center my-2">
+            <button @click="addingItem=!addingItem" class="btn-primary-custom">Done</button>
+            <button @click.prevent="resetSearch" class="btn btn-secondary">Reset</button>
           </div>
+          <hr>
 
-        <!-- Search Results -->
-        <div>
-          <ul>
-            <li v-for="(rec, i) in filteredForecast" :key="i" class="my-1 d-flex flex-row no-wrap justify-content-between align-items-center">
-              <div>
-                <p v-if='rec["Stems per Bunch"] != 10'>{{rec.Color}} || {{rec.Tier}}{{ rec.Crop }}, {{ rec.Variety }}  ({{ rec["SKU #"] }}), ${{rec["Price per Bunch"] }}/bu @ {{ rec["Stems per Bunch"] }} spb</p>
-                <p v-else>{{rec.Color}} || {{rec.Tier}} {{ rec.Crop }}, {{ rec.Variety }},  ({{ rec["SKU #"] }}), ${{rec["Price per Bunch"] }}/bu</p>
-              </div>
-              <div>
-                <i class="far fa-plus-square ml-1" @click="addToOrder(rec)"></i>
-              </div>
-            </li>
-          </ul>
+          <!-- Search Results -->
+          <div>
+            <ul>
+              <li 
+              v-for="(rec, i) in filteredForecast" 
+              :key="i" 
+              class="my-1 d-flex flex-row no-wrap justify-content-between align-items-center border-bottom">
+                <div >
+                  <div v-if='rec["Stems per Bunch"] != 10'>
+                    <p>{{ rec.Crop }}, {{ rec.Variety }} </p>
+                    <p>{{ rec.Color }}, {{ rec.Category }}</p>
+                    <p><small class="text-muted">({{ rec["SKU #"] }})</small> {{rec["Price per Bunch"] }}/bu @ {{ rec["Stems per Bunch"] }} spb</p>
+                  </div>
+                  <div v-else>
+                    <p>{{ rec.Crop }}, {{ rec.Variety }} </p>
+                    <p>{{ rec.Color }}, {{ rec.Category }}</p>
+                    <p><small class="text-muted">({{ rec["SKU #"] }})</small>, ${{rec["Price per Bunch"] }}/bu</p>
+                  </div>
+                </div>
+                <div>
+                  <select name="amt" :id="'select'+i" @change="addToOrder(rec, i)">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15">15</option>
+                    <option value="16">16</option>
+                    <option value="17">17</option>
+                    <option value="18">18</option>
+                    <option value="19">19</option>
+                    <option value="20">20</option>
+                  </select>
+                  <!-- <i class="far fa-plus-square ml-1" @click="addToOrder(rec)"></i> -->
+                </div>
+              </li>
+            </ul>
+          </div>
         </div>
+
+        <div class="form-row ">
+          <div class="col d-flex flex-row justify-content-center">
+              <button type="button" class="btn-primary-custom" v-on:click="saveOrder" >Save</button>  
+          </div>
+          <div class="col d-flex flex-row justify-content-center">
+            <router-link to="/order" class="btn btn-secondary">Cancel</router-link> 
+          </div>        
       </div>
-
-      <div class="form-row ">
-        <div class="col d-flex flex-row justify-content-center">
-            <button type="button" class="btn-primary-custom" v-on:click="saveOrder" >Save</button>  
-        </div>
-        <!-- <div class="col">
-            <p></p>
-        </div> -->
-        <div class="col d-flex flex-row justify-content-center">
-          <router-link to="/order" class="btn btn-secondary">Cancel</router-link> 
-        </div>        
-      </div>
-
-
     </form>
-    <br />
-    <br />
-
   </div>
 </template>
 
@@ -201,7 +234,8 @@ export default {
      priceRange: null,
      searchCriteria: [],
      checkedCategories: [],
-     checkedColors: []
+     checkedColors: [],
+     addingItem: false
     }
     
   },
@@ -225,13 +259,20 @@ export default {
 
       this.updateForecastSearch()
     },
-    addToOrder(rec){
+    addToOrder(rec, index){
       console.log(rec)
 
-      rec.Bunches = 1
-      let extended = Number(rec["Price per Bunch"]) * Number(rec.Bunches)
-      rec.Extended = extended
+      if (this.orderDetails.includes(rec)) {
+        console.log('already in order');
+        this.orderDetails.splice(this.orderDetails.indexOf(rec), 1)
+        
+      }
+      
+      rec.Bunches = document.getElementById('select' + index).value
+      rec.Extended = Number(rec["Price per Bunch"]) * Number(rec.Bunches)
       this.orderDetails.push(rec)
+      console.log('adding to order');
+
     },
     onChangeVariety() {
       this.refreshLines() 
@@ -660,6 +701,15 @@ span.badge{
   padding: 0.5em 0.5em;
 }
 
+#search-filter{
+  border: solid 2px lightgray;
+  border-radius: .25em;
+}
+
+#addItemBtn:hover{
+  cursor: pointer;
+}
+
 i.color-dot{
   border-radius: 50%;
 }
@@ -692,6 +742,10 @@ small.sku {
 
 p{
   margin-bottom: 0;
+}
+
+.evenRow{
+  background-color: #F4C9C9;
 }
 
 </style>
