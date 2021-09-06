@@ -63,92 +63,7 @@
       <h3>Order Detail</h3>
       <br />
 
-      <!--
-        Line items
-      -->
-      <hr>
-
-      <div class="form-row">
-        <div class="col">
-          <label for="Variety">Variety</label>
-        </div>
-        <div class="col-2">
-          <label for="Quantity">Bu</label>
-        </div>
-        <div class="col-3">
-          <label for="ExtendPrice">Extended</label>
-        </div>
-      </div>
-
-
-      <div class="form-row" v-for="(detail, index ) in orderDetails" :key="index">
-        <div class="col">
-          
-          <select class="form-control form-control-sm"  v-on:change="onChangeVariety" v-model="orderDetails[index].SKU">
-            <option value="" placeholder="select variety" ></option>
-            <option v-for="rec in forecastRecords" :key="rec.SKU" :value="rec.SKU" >
-              <p v-if='rec["Stems per Bunch"] != 10'>{{ rec.Crop }}, {{ rec.Variety }} {{rec.Color}} ({{ rec["SKU #"] }}), ${{rec["Price per Bunch"] }}/bu @ {{ rec["Stems per Bunch"] }} spb</p>
-              <p v-else>{{ rec.Crop }}, {{ rec.Variety }}, {{rec.Color}} ({{ rec["SKU #"] }}), ${{rec["Price per Bunch"] }}/bu</p>
-            </option>  
-          </select>
-          <!-- <small><i>{{ detail.Crop }} - {{ detail.Variety }} ({{ detail.SKU }}) - ${{detail["Price per Bunch"] }}/bu @ {{ detail["Stems per Bunch"] }} spb</i></small>
-          <p></p> -->
-        </div>
-
-        <!-- <div class="col-2">
-          <input v-model="orderDetails[index].Bunches" type="number" class="form-control" placeholder="" v-on:change="onChangeQuantity"/>
-        </div> -->
-        <div class="col-2">
-          <select class="form-control form-control-sm" name="bunches" id="bunches"  v-model="orderDetails[index].Bunches"  v-on:change="onChangeQuantity">
-            <option value="0">0</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-            <option value="11">11</option>
-            <option value="12">12</option>
-            <option value="13">13</option>
-            <option value="14">14</option>
-            <option value="15">15</option>
-            <option value="16">16</option>
-            <option value="17">17</option>
-            <option value="18">18</option>
-            <option value="19">19</option>
-            <option value="20">20</option>
-            <option value="21">21</option>
-            <option value="22">22</option>
-            <option value="23">23</option>
-            <option value="24">24</option>
-            <option value="24">24</option>
-          </select>
-          
-        </div>
-
-        <div class="col-3">
-          <input v-model="detail.Extended" type="number" class="form-control" placeholder="" readonly="true"/>
-        </div>
-
-      </div>
-
-      <div class="form-row">
-        <div class="col">
-            <p></p>
-        </div>
-        <div class="col-2">
-          <p></p>
-        </div>
-
-        <div class="col-3">
-          <hr>
-        </div>        
-      </div>
-      
+            
       <div class="form-row">
         <div class="col">
             <p><small class="form-text text-muted">All varieties sold at 10 stems per bunch (spb) unless stated otherwise</small></p>  
@@ -156,10 +71,6 @@
         <div class="col-2">
           <p></p>
         </div>
-
-        <div class="col-3">
-          <input :value="orderTotal" type="number" class="form-control" placeholder="0.00" readonly="true"/>
-        </div>        
       </div>
 
         
@@ -170,7 +81,8 @@
           <div class="lineItem">
             
             <div class="top-row d-flex flex-row justify-content-between align-items-start">
-              <span class="lead">{{detail.Crop}}</span> <i class="color-dot fas fa-circle" style="color:#F4C9C9"></i>
+                                                                                    <!-- :style="{color:detail.Color}" -->
+              <span class="lead">{{detail.Crop}}</span> <i class="color-dot fas fa-leaf" style="color:#F4C9C9"></i>
             </div>
             
             <div class="middle-row my-2 d-flex flex-row justify-content-around">
@@ -189,36 +101,58 @@
         </li>
       </ul>
 
-      <div>
+      <div id="search-filter">
         <!-- Color Dots/Swatches -->
         <ul class="d-flex flex-row justify-content-around">
-          <li v-for="swatch in colorOptions" :key="swatch" @click="filterByColor(swatch)" :class="{inactiveSwatch: !searchCriteria.includes(swatch)}" >
-            <i class="color-dot fas  fa-seedling" :style="{color:swatch}"></i>
+          <li v-for="swatch in colorOptions" :key="swatch" >
+            <input type="checkbox" :id="swatch" :value="swatch" class="mr-1" v-model="checkedColors">
+            <label for="swatch">
+              <i class="color-dot fas fa-seedling" :style="{color:swatch}"></i>
+            </label>
           </li>
         </ul>
 
-        <form class="search d-flex flex-row align-items-center " @submit.prevent="searchForecast" >
+        <!-- checkbox for select by category -->
+        <div class="d-flex flex-row justify-content-between">
+          <div>
+            <input type="checkbox" id="flower" value="Flower" class="mr-1" v-model="checkedCategories">
+            <label for="flower" >Flower</label>
+          </div>
+          <div>
+            <input type="checkbox" id="filler" value="Filler" class="mr-1" v-model="checkedCategories">
+            <label for="flower" class="form-check-label">Filler</label>
+          </div>
+          <div >
+            <input type="checkbox"  id="foliage" value="Foliage" class="mr-1" v-model="checkedCategories">
+            <label for="flower" >Foliage</label>
+          </div>          
+        </div>
+
+        <form class="search d-flex flex-row align-items-center " @submit.prevent="addSearchTerm" >
           
-          <input id="searchBar" type="text" class="form-control" v-model="searchTerm" placeholder="Search Forecast">
+          <input id="searchBar" type="text" class="form-control" v-model="searchTerm" placeholder="Search by Crop or Variety">
 
           <div id="priceFilter" class="d-flex flex-column align-items-center">
-            <i class="fas fa-angle-up" @click="increasePrice"></i>
-            <div style="width:3em; text-align:center">{{dollarSigns}}</div>
-            <i class="fas fa-angle-down" @click="decreasePrice"></i>
+            <select name="price-range" id="price-range" v-model="priceRange">
+              <option value="null" > </option>
+              <option value="2">$</option>
+              <option value="4" selected>$$</option>
+              <option value="6">$$$</option>
+            </select>
           </div>
-        </form>
 
+        </form>
+          <div>
+            <button @click.prevent="resetSearch">Reset</button>
+          </div>
+
+        <!-- Search Results -->
         <div>
-          <ul class="d-flex flex-row flex-wrap mt-1">
-            <li v-for="(term, i) in searchCriteria" :key="i" class="mx-1">
-              <span class="badge rounded-pill">{{term}}<i class="far fa-times-circle ml-1" @click="removeSearchTerm(term)"></i> </span> 
-            </li>
-          </ul>
           <ul>
-            <li v-for="(rec, i) in searchResults" :key="i" class="my-1 d-flex flex-row no-wrap justify-content-between align-items-center">
+            <li v-for="(rec, i) in filteredForecast" :key="i" class="my-1 d-flex flex-row no-wrap justify-content-between align-items-center">
               <div>
-                <p v-if='rec["Stems per Bunch"] != 10'>{{rec.Tier}}{{ rec.Crop }}, {{ rec.Variety }} {{rec.Color}} ({{ rec["SKU #"] }}), ${{rec["Price per Bunch"] }}/bu @ {{ rec["Stems per Bunch"] }} spb</p>
-                <p v-else>{{rec.Tier}} {{ rec.Crop }}, {{ rec.Variety }}, {{rec.Color}} ({{ rec["SKU #"] }}), ${{rec["Price per Bunch"] }}/bu</p>
+                <p v-if='rec["Stems per Bunch"] != 10'>{{rec.Color}} || {{rec.Tier}}{{ rec.Crop }}, {{ rec.Variety }}  ({{ rec["SKU #"] }}), ${{rec["Price per Bunch"] }}/bu @ {{ rec["Stems per Bunch"] }} spb</p>
+                <p v-else>{{rec.Color}} || {{rec.Tier}} {{ rec.Crop }}, {{ rec.Variety }},  ({{ rec["SKU #"] }}), ${{rec["Price per Bunch"] }}/bu</p>
               </div>
               <div>
                 <i class="far fa-plus-square ml-1" @click="addToOrder(rec)"></i>
@@ -263,101 +197,28 @@ export default {
      forecastRecords: [],
      forecastMap: new Map(),
      searchTerm: '',
-     searchCriteria: [],
-     searchResults: [],
      colorOptions: ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'],
-     priceRange: 2
+     priceRange: null,
+     searchCriteria: [],
+     checkedCategories: [],
+     checkedColors: []
     }
     
   },
 
   methods: {
-    increasePrice(){
-      if (this.priceRange < 5) {
-        this.priceRange += 2
-        this.updateForecastSearch()
-      }
+    resetSearch(){
+      this.searchCriteria = []
+      this.checkedColors = []
+      this.checkedColors = []
     },
-    decreasePrice(){
-      if (this.priceRange > 2) {
-        this.priceRange -= 2
-        this.updateForecastSearch()
-      }
-    },
-    filterByColor(color){
-      if (this.searchCriteria.includes(color)) {
-        console.log('colord already selected')
-        
-        let index = this.searchCriteria.indexOf(color)
-        
-        this.searchCriteria.splice(index, 1)
-
-        this.updateForecastSearch()
-      }
-      else {
-        
-        this.searchTerm = color
-  
-        this.searchForecast()
-      }
-    },
-    searchForecast(){
+    
+    addSearchTerm(){
       this.searchCriteria.push(this.searchTerm)
-
-      this.updateForecastSearch()
 
       this.searchTerm = ''
     },
-    updateForecastSearch(){
-
-      if (this.searchCriteria.length === 0) {
-        this.searchResults = []
-      }
-
-      this.searchCriteria.forEach(term => {
-        this.filterByTerm(term)
-      })
-
-    },
-    filterByTerm(term){
-      let forecastList
-      
-      if (this.searchCriteria.length === 1) {
-        forecastList = this.forecastRecords
-      }
-      else{
-        forecastList = this.searchResults
-      }
-      
-      let narrowedList = []
-
-      forecastList.forEach(rec => {
-        
-        if (rec.Crop.toLowerCase().includes(term.toLowerCase())) {
-          
-          narrowedList.push(rec)
-        }
-
-        if (rec.Variety.toLowerCase().includes(term.toLowerCase())) {
-          
-          narrowedList.push(rec)
-        }
-
-        if (rec.SKU.toLowerCase().includes(term.toLowerCase())) {
-          
-          narrowedList.push(rec)
-        }
-
-        if (rec.Color.toLowerCase().includes(term.toLowerCase())) {
-          
-          narrowedList.push(rec)
-        }
-      })
-
-      this.searchResults = narrowedList.filter(r => {
-        return parseInt(r.Tier) <= this.priceRange
-      })
-    },
+    
     removeSearchTerm(term){
 
       this.searchCriteria = this.searchCriteria.filter(t => t !==term)
@@ -471,6 +332,7 @@ export default {
       }
 
       var Airtable = require('airtable');
+
       Airtable.configure({
           endpointUrl: 'https://api.airtable.com',
           apiKey: this.$auth.user['https://app.madriverfloralcollective.com/airtable'] 
@@ -593,10 +455,7 @@ export default {
             console.error(err); 
             return; 
 
-          } else {
-            // Add blank line even if list is empty
-            this.addBlankLine(true)
-          }
+          } 
       }
 
 
@@ -670,48 +529,7 @@ export default {
       this.forecastRecords = recs
 
     },
-
-    //
-    // Add one empty line for user to add new items
-    //
-    addBlankLine(addIfEmpty){
-
-      let blankLine = {
-        isNew: true,
-        RecID: "", 
-        Account: this.order.Account,
-        SKU: "", 
-        Crop: "",
-        Variety: "", 
-        Color: "",
-        Bunches: 0,
-        "Price per Bunch": 0,
-        "Stems per Bunch": 0, 
-        Extended: 0
-      }
-
-      //
-      // If orderDetails has elements then look a the last element
-      // and if the last element is not an "empty line" then add 
-      // and "empty line"
-      //
-      if (this.orderDetails.length > 0){
-        var last = Number(this.orderDetails.length - 1)
-        if (this.orderDetails[last].Bunches > 0 || this.orderDetails[last].SKU.length > 0){
-          this.orderDetails.push(blankLine)
-        }
-      }
-
-      //
-      // This is used on initial load of db but not 
-      // during the order edit phase
-      if (this.orderDetails.length == 0 && addIfEmpty){
-          this.orderDetails.push(blankLine)
-      }
-      
-
-    },
-
+    
     //
     // Populate forecastMap from array
     //
@@ -721,22 +539,73 @@ export default {
           this.forecastMap.set(this.forecastRecords[i].SKU,this.forecastRecords[i])
         }
       }
-    }
+    },
 
   },
   mounted(){
     this.getForecastRecords()
     this.getOrder()
   },
-  beforeUpdate() {
-    
-  },
   updated(){   
     this.populateForecastMap()
-    this.addBlankLine(false)
   },
 
   computed: {
+    filteredForecast(){
+
+      let filteredList = this.forecastRecords
+
+      // For each record in forcast, if record does not contain the selected color remove it from the list
+      // Right now this does not work for Mixes, but if Color was an Array it would
+      if (this.checkedColors.length > 0) {
+
+        filteredList = filteredList.filter(rec => {
+          
+          return this.checkedColors.includes(rec.Color.toLowerCase())
+        })
+      }
+
+      if (this.searchCriteria.length > 0) {
+        
+        this.searchCriteria.forEach(term => {
+
+          filteredList = filteredList.filter(rec => {
+  
+            let cropVarietySKU = rec.Crop + ' ' + rec.Variety + ' ' + rec.SKU
+            
+            return cropVarietySKU.toLowerCase().includes(term.toLowerCase())
+          })
+        })
+      }
+
+      if (this.priceRange) {
+        console.log('filter by price');
+        filteredList = filteredList.filter(rec => {
+          
+          return parseInt(rec.Tier) <= this.priceRange
+        })
+      }
+
+      // Filter out any record in the search result that does not belong to one of the selected categories
+      if (this.checkedCategories.length > 0) {
+        
+        filteredList = filteredList.filter(rec => {
+
+          return this.checkedCategories.includes(rec.Category)
+        })
+      }
+
+      // if search criteria have been provided, return result of search. else return the unfiltered forecast
+      if (this.checkedCategories.length > 0 || this.checkedColors.length > 0 || this.searchCriteria.length > 0 || this.priceRange) {
+        
+        return filteredList
+      }
+      else {
+
+        return this.forecastRecords
+      }
+
+    },
     dollarSigns(){
       switch (this.priceRange) {
         case 1:
@@ -756,8 +625,6 @@ export default {
       }
     }
   }
-
-
 }
 </script>
 
@@ -825,10 +692,6 @@ small.sku {
 
 p{
   margin-bottom: 0;
-}
-
-.inactiveSwatch{
-  opacity: 0.5;
 }
 
 </style>
