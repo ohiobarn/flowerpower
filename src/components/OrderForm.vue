@@ -74,7 +74,7 @@
 
         
       <hr>
-      <!-- prototype order detial layout -->
+      <!-- prototype order detail layout -->
       <ul class="pl-0">
         <li v-for="(detail, index ) in orderDetails" :key="index">
           <div class="lineItem">
@@ -93,7 +93,39 @@
             </div>
             
             <div class="bottom-row d-flex flex-row justify-content-between align-items-center">
-              <small class="sku">{{detail.SKU}}</small> <span class="bunches">{{detail.Bunches}} x ${{detail["Price per Bunch"]}}</span> <span class="extended">${{detail.Extended}}</span> 
+              <small class="sku">{{detail.SKU}}</small> 
+              <span class="bunches">
+                <select name="bunches" id="bunches"  v-model="orderDetails[index].Bunches"  v-on:change="onChangeQuantity">
+                  <option value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
+                  <option value="11">11</option>
+                  <option value="12">12</option>
+                  <option value="13">13</option>
+                  <option value="14">14</option>
+                  <option value="15">15</option>
+                  <option value="16">16</option>
+                  <option value="17">17</option>
+                  <option value="18">18</option>
+                  <option value="19">19</option>
+                  <option value="20">20</option>
+                  <option value="21">21</option>
+                  <option value="22">22</option>
+                  <option value="23">23</option>
+                  <option value="24">24</option>
+                  <option value="24">24</option>
+                </select>
+                
+                x ${{detail["Price per Bunch"]}}</span> 
+              <span class="extended">${{detail.Extended}}</span> 
             </div>
           
           </div>
@@ -132,9 +164,10 @@
           </div>          
         </div>
 
-        <form class="search d-flex flex-row align-items-center " @submit.prevent="addSearchTerm" >
+        <form class="search d-flex flex-row align-items-center" @submit.prevent="prevent()" >
           
-          <input id="searchBar" type="text" class="form-control" v-model="searchTerm" placeholder="Search by Crop or Variety">
+          <!-- SEARCH BAR -->
+          <input id="searchBar" type="text" class="form-control" v-model="searchTerm" placeholder="Search by Crop/Variety">
 
           <div id="priceFilter" class="d-flex flex-column align-items-center">
             <select name="price-range" id="price-range" v-model="priceRange">
@@ -144,13 +177,14 @@
               <option value="6">$$$</option>
             </select>
           </div>
+
         </form>
 
           <!-- reset search button -->
-          <div class="d-flex flex-row justify-content-between align-items-center my-2">
+          <div class="d-flex flex-row justify-content-end align-items-center my-2">
             <button @click="addingItem=!addingItem" class="btn-primary-custom">Done</button>
-            <button @click.prevent="resetSearch" class="btn btn-secondary">Reset</button>
           </div>
+
           <hr>
 
           <!-- Search Results -->
@@ -159,7 +193,9 @@
               <li 
               v-for="(rec, i) in filteredForecast" 
               :key="i" 
-              class="my-1 d-flex flex-row no-wrap justify-content-between align-items-center border-bottom">
+              class="my-1 d-flex flex-row no-wrap justify-content-between align-items-center border-bottom"
+              @click="addToOrder(rec)"
+              >
                 <div >
                   <div v-if='rec["Stems per Bunch"] != 10'>
                     <p>{{ rec.Crop }}, {{ rec.Variety }} </p>
@@ -171,32 +207,6 @@
                     <p>{{ rec.Color }}, {{ rec.Category }}</p>
                     <p><small class="text-muted">({{ rec["SKU #"] }})</small>, ${{rec["Price per Bunch"] }}/bu</p>
                   </div>
-                </div>
-                <div>
-                  <select name="amt" :id="'select'+i" @change="addToOrder(rec, i)">
-                    <option value="0">0</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                    <option value="11">11</option>
-                    <option value="12">12</option>
-                    <option value="13">13</option>
-                    <option value="14">14</option>
-                    <option value="15">15</option>
-                    <option value="16">16</option>
-                    <option value="17">17</option>
-                    <option value="18">18</option>
-                    <option value="19">19</option>
-                    <option value="20">20</option>
-                  </select>
-                  <!-- <i class="far fa-plus-square ml-1" @click="addToOrder(rec)"></i> -->
                 </div>
               </li>
             </ul>
@@ -232,7 +242,6 @@ export default {
      searchTerm: '',
      colorOptions: ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'],
      priceRange: null,
-     searchCriteria: [],
      checkedCategories: [],
      checkedColors: [],
      addingItem: false
@@ -241,40 +250,34 @@ export default {
   },
 
   methods: {
+    prevent(){
+      // this is to prevent the search bar from refereshing the page by accident
+      console.log('prevent refresh');
+    },
+
     resetSearch(){
       this.searchCriteria = []
       this.checkedColors = []
       this.checkedColors = []
     },
     
-    addSearchTerm(){
-      this.searchCriteria.push(this.searchTerm)
+    addToOrder(rec){
 
-      this.searchTerm = ''
-    },
-    
-    removeSearchTerm(term){
-
-      this.searchCriteria = this.searchCriteria.filter(t => t !==term)
-
-      this.updateForecastSearch()
-    },
-    addToOrder(rec, index){
-      console.log(rec)
-
-      if (this.orderDetails.includes(rec)) {
-        console.log('already in order');
-        this.orderDetails.splice(this.orderDetails.indexOf(rec), 1)
+      if (this.orderDetails.some(order => order.SKU === rec.SKU)) {
+        alert('This item is already part of your order.');
       }
-      
-      rec.Bunches = document.getElementById('select' + index).value
-      rec.Extended = Number(rec["Price per Bunch"]) * Number(rec.Bunches)
-      rec.isNew = true
+      else {
 
-      this.orderDetails.push(rec)
-      console.log('adding to order');
-
+        rec.Bunches = 1
+        rec.Extended = Number(rec["Price per Bunch"]) * Number(rec.Bunches)
+        rec.isNew = true
+  
+        this.orderDetails.push(rec)
+  
+        this.addingItem = false
+      }
     },
+
     onChangeVariety() {
       this.refreshLines() 
     },
@@ -585,6 +588,7 @@ export default {
   mounted(){
     this.getForecastRecords()
     this.getOrder()
+    this.refreshLines()
   },
   updated(){   
     this.populateForecastMap()
@@ -605,17 +609,16 @@ export default {
         })
       }
 
-      if (this.searchCriteria.length > 0) {
-        
-        this.searchCriteria.forEach(term => {
+      // filter by search term (if 3 characters or longer)
+      if (this.searchTerm.length > 2) {
 
-          filteredList = filteredList.filter(rec => {
-  
-            let cropVarietySKU = rec.Crop + ' ' + rec.Variety + ' ' + rec.SKU
-            
-            return cropVarietySKU.toLowerCase().includes(term.toLowerCase())
-          })
+        filteredList = filteredList.filter(rec => {
+
+          let cropVarietySKU = rec.Crop + ' ' + rec.Variety + ' ' + rec.SKU
+
+          return cropVarietySKU.toLowerCase().includes(this.searchTerm.toLowerCase())
         })
+
       }
 
       if (this.priceRange) {
@@ -636,7 +639,7 @@ export default {
       }
 
       // if search criteria have been provided, return result of search. else return the unfiltered forecast
-      if (this.checkedCategories.length > 0 || this.checkedColors.length > 0 || this.searchCriteria.length > 0 || this.priceRange) {
+      if (this.checkedCategories.length > 0 || this.checkedColors.length > 0 || this.searchTerm.length > 2 || this.priceRange) {
         
         return filteredList
       }
