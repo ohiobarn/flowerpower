@@ -265,11 +265,12 @@ export default {
       if (this.orderDetails.includes(rec)) {
         console.log('already in order');
         this.orderDetails.splice(this.orderDetails.indexOf(rec), 1)
-        
       }
       
       rec.Bunches = document.getElementById('select' + index).value
       rec.Extended = Number(rec["Price per Bunch"]) * Number(rec.Bunches)
+      rec.isNew = true
+
       this.orderDetails.push(rec)
       console.log('adding to order');
 
@@ -401,6 +402,8 @@ export default {
             Extended: Number(this.orderDetails[i].Extended),
             OrderRecID: [this.order.RecID]
           }
+          console.log('detail');
+          console.log(detail);
 
           // If New and SKU and Bunches specified then create
           if(this.orderDetails[i].isNew && this.orderDetails[i].SKU.length > 0 && this.orderDetails[i].Bunches > 0 ){
@@ -458,11 +461,7 @@ export default {
 
         // Populate model
         this.orderDetails = orderDetails
-
-
-
       }
-
 
       //
       // Page
@@ -472,6 +471,7 @@ export default {
 
           records.forEach(function(record) {
             var orderDetail = record.fields
+            orderDetail.isNew = false
             orderDetails.push(orderDetail)
           });
 
@@ -479,7 +479,6 @@ export default {
           // If there are more records, `page` will get called again.
           // If there are no more records, `done` will get called.
           fetchNextPage();
-
       }
 
       //
