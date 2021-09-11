@@ -60,17 +60,12 @@
 
       <br />
       <h3 id="order-detail-header">Order Detail</h3>
-      <br />
+      <div>
+        <span class="lead"> Total: ${{runningTotal}}</span>
+      </div>
 
             
-      <div class="form-row">
-        <div class="col">
-            <p><small class="form-text text-muted">All varieties sold at 10 stems per bunch (spb) unless stated otherwise</small></p>  
-        </div>
-        <div class="col-2">
-          <p></p>
-        </div>
-      </div>
+
 
         
       <hr>
@@ -135,7 +130,17 @@
           <h3 class="text-center">+</h3>
         </li>
 
+
       </ul>
+
+      <div class="form-row my-2">
+        <div class="col">
+            <p><small class="form-text text-muted">All varieties sold at 10 stems per bunch (spb) unless stated otherwise</small></p>  
+        </div>
+        <div class="col-2">
+          <p></p>
+        </div>
+      </div>
 
       <div id="search-filter" v-if="addingItem" class="px-2 py-1">
         <!-- Color Dots/Swatches -->
@@ -171,10 +176,9 @@
 
           <div id="priceFilter" class="d-flex flex-column align-items-center">
             <select name="price-range" id="price-range" v-model="priceRange">
-              <option value="null" > </option>
               <option value="2">$</option>
-              <option value="4" selected>$$</option>
-              <option value="6">$$$</option>
+              <option value="4" >$$</option>
+              <option value="6" selected>$$$</option>
             </select>
           </div>
 
@@ -213,12 +217,12 @@
           </div>
         </div>
 
-        <div class="form-row ">
+        <div class="form-row my-2">
           <div class="col d-flex flex-row justify-content-center">
               <button type="button" class="btn-primary-custom" v-on:click="saveOrder" >Save</button>  
           </div>
           <div class="col d-flex flex-row justify-content-center">
-            <router-link to="/order" class="btn btn-secondary">Cancel</router-link> 
+            <router-link to="/order" class="btn btn-secondary test">Cancel</router-link> 
           </div>        
       </div>
     </form>
@@ -291,11 +295,13 @@ export default {
         this.orderDetails.push(rec)
   
         this.addingItem = false
+
+        this.resetSearch()
       }
     },
-    onChangeVariety() {
-      this.refreshLines() 
-    },
+    // onChangeVariety() {
+    //   this.refreshLines() 
+    // },
     onChangeQuantity() {
       this.refreshLines()
     },
@@ -325,8 +331,9 @@ export default {
           
           // Extend the price
           let extended = Number(this.orderDetails[i]["Price per Bunch"]) * Number(this.orderDetails[i].Bunches)
-          this.orderDetails[i].Extended = Number(extended).toFixed(2)
 
+          this.orderDetails[i].Extended = Number(extended).toFixed(2)
+          console.log(extended);
           orderTotal = orderTotal + extended
         }
       }
@@ -463,7 +470,7 @@ export default {
 
         // Order Header
         this.order = record.fields
-
+    
         // Get Order Detail
         var selectRecord = {
           pageSize: 25,
@@ -479,6 +486,8 @@ export default {
 
         // Populate model
         this.orderDetails = orderDetails
+
+        
       }
 
       //
@@ -488,8 +497,18 @@ export default {
           // This function (`page`) will get called for each page of records.
 
           records.forEach(function(record) {
+           
             var orderDetail = record.fields
+            
             orderDetail.isNew = false
+            
+            // orderDetail["Price per Bunch"] = Number(record["Price per Bunch"]).toFixed(2)
+            orderDetail["Price per Bunch"] = Number(orderDetail["Price per Bunch"]).toFixed(2)
+            
+            let extended = Number(orderDetail["Price per Bunch"]) * Number(orderDetail.Bunches)
+
+            orderDetail.Extended = extended.toFixed(2)
+           
             orderDetails.push(orderDetail)
           });
 
@@ -509,27 +528,28 @@ export default {
       // Done
       //
       const orderDetailDone = (err) => {
-          if (err) { 
-            console.error(err); 
-            return; 
-
-          } 
+        if (err) { 
+          console.error(err); 
+          return; 
+        } 
       }
 
 
       var orderDetails = []
-      // var account = this.$auth.user.email
 
       var Airtable = require('airtable');
+
       var atConf = {
-          endpointUrl: 'https://api.airtable.com',
-          apiKey: this.$auth.user['https://app.madriverfloralcollective.com/airtable'] 
+        endpointUrl: 'https://api.airtable.com',
+        apiKey: this.$auth.user['https://app.madriverfloralcollective.com/airtable'] 
       }
+
       Airtable.configure(atConf);
+
       var base = Airtable.base('apptDZu7d1mrDMIFp'); //MRFC
 
       base('Order')
-      .find(this.RecID)
+      .find(this.RecID) // Order #
       .then(getOrderDetail)
       .catch(done)
 
@@ -616,7 +636,6 @@ export default {
   mounted(){
     this.getForecastRecords()
     this.getOrder()
-    this.refreshLines()
 
     window.addEventListener('scroll', this.handleScroll)
   },
@@ -697,6 +716,16 @@ export default {
           return 'NA';
       }
     },
+    runningTotal(){
+      
+      let sum = 0
+
+      this.orderDetails.forEach(rec => {
+        sum += Number(rec.Extended) 
+      })
+
+      return sum
+    }
   }
 }
 </script>
@@ -711,6 +740,10 @@ export default {
   font-size: 1rem;
   line-height: 1.5;
   border-radius: .25rem;
+}
+
+.bottom-row{
+  font-size: 0.75em;
 }
 
 #priceFilter{
@@ -755,7 +788,7 @@ ul{
 }
 
 small.sku {
-  width: 100px;
+  width: 125px;
   display: inline-block;
   text-align: center;
 }
@@ -775,11 +808,6 @@ small.sku {
 p{
   margin-bottom: 0;
 }
-
-.evenRow{
-  background-color: #F4C9C9;
-}
-
 
 #scroll-btn{
   position: fixed;

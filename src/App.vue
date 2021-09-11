@@ -72,6 +72,7 @@ export default {
 
 <style>
 
+
 .fp-nav {
 background-color: #f6edf9;
 }
