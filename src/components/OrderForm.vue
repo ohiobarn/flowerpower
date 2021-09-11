@@ -59,7 +59,7 @@
       </div>
 
       <br />
-      <h3>Order Detail</h3>
+      <h3 id="order-detail-header">Order Detail</h3>
       <br />
 
             
@@ -131,7 +131,7 @@
           </div>
         </li>
 
-        <li id="addItemBtn" class="lineItem" v-if="!addingItem" @click="addingItem=!addingItem">
+        <li id="addItemBtn" class="lineItem" v-if="!addingItem" @click="startSearch">
           <h3 class="text-center">+</h3>
         </li>
 
@@ -194,7 +194,7 @@
               v-for="(rec, i) in filteredForecast" 
               :key="i" 
               class="my-1 d-flex flex-row no-wrap justify-content-between align-items-center border-bottom"
-              @click="addToOrder(rec)"
+              @click="addToOrder(rec)" 
               >
                 <div >
                   <div v-if='rec["Stems per Bunch"] != 10'>
@@ -222,6 +222,7 @@
           </div>        
       </div>
     </form>
+    <div v-if="showScrollUp" id="scroll-btn" @click.prevent="scrollUp"><i class="fas fa-chevron-up"></i></div>
   </div>
 </template>
 
@@ -244,15 +245,30 @@ export default {
      priceRange: null,
      checkedCategories: [],
      checkedColors: [],
-     addingItem: false
+     addingItem: false,
+     scrollToPoint: null,
+     showScrollUp: false,
     }
     
   },
 
   methods: {
+
     prevent(){
       // this is to prevent the search bar from refereshing the page by accident
       console.log('prevent refresh');
+    },
+
+    startSearch(){
+      this.addingItem = true
+
+      const getScrollPoint = () => {
+        let searchFilter = document.getElementById('search-filter')
+
+        this.scrollToPoint =  searchFilter.offsetTop - 190;
+      }
+
+      setTimeout(getScrollPoint, 500) // gives page time to re-render before grabbing Y-value of element
     },
 
     resetSearch(){
@@ -277,7 +293,6 @@ export default {
         this.addingItem = false
       }
     },
-
     onChangeVariety() {
       this.refreshLines() 
     },
@@ -583,12 +598,27 @@ export default {
         }
       }
     },
+    scrollUp(){
+      window.scrollTo({top: this.scrollToPoint, behavior: "smooth"} )
+    },
+    handleScroll(){
 
+      if ( this.scrollToPoint && document.documentElement.scrollTop > this.scrollToPoint || document.body.scrollTop > this.scrollToPoint > this.scrollToPoint) {
+
+        this.showScrollUp = true
+      }
+      else {
+        
+        this.showScrollUp = false
+      }
+    }
   },
   mounted(){
     this.getForecastRecords()
     this.getOrder()
     this.refreshLines()
+
+    window.addEventListener('scroll', this.handleScroll)
   },
   updated(){   
     this.populateForecastMap()
@@ -666,7 +696,7 @@ export default {
         default:
           return 'NA';
       }
-    }
+    },
   }
 }
 </script>
@@ -748,6 +778,15 @@ p{
 
 .evenRow{
   background-color: #F4C9C9;
+}
+
+
+#scroll-btn{
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  margin-right: 10px;
+  margin-bottom: 20px;
 }
 
 </style>
