@@ -64,8 +64,8 @@
       <hr>
       <!-- prototype order detail layout -->
       <ul class="pl-0">
-        <li v-for="(detail, index ) in orderDetails" :key="index">
-          <div class="lineItem">
+        <li v-for="(detail, index ) in orderDetails" :key="index" :class="{'hide-item' : Number(detail.Bunches)===0}">
+          <div class="lineItem ">
             
             <div class="top-row d-flex flex-row justify-content-between align-items-start">
                                                                                     <!-- :style="{color:detail.Color}" -->
@@ -228,7 +228,7 @@
               <button type="button" class="btn-primary-custom" v-on:click="saveOrder" >Save</button>  
           </div>
           <div class="col d-flex flex-row justify-content-center">
-            <router-link to="/order" class="btn btn-secondary test">Cancel</router-link> 
+            <router-link to="/order" class="btn btn-secondary">Cancel</router-link> 
           </div>        
       </div>
     </form>
@@ -315,46 +315,27 @@ export default {
     // refresh line
     //
     refreshLines(){
-            this.orderDetails.forEach(rec => {
-
-        console.log(rec.Bunches);
-        // if (rec.Bunches === 0) {
-        //   console.log('out of ' + rec.Crop);
-        // }
-      })
 
       let orderTotal = 0
 
-      var noLines = Number(this.orderDetails.length)
-      for (let i = 0; i < noLines; i++) {
-      
-        // Don't let the quantity go negative
-        if (Number(this.orderDetails[i].Bunches) < 0 ) {
-          this.orderDetails[i].Bunches = 0
+
+      this.orderDetails.forEach(rec => {
+
+
+        if (Number(rec.Bunches) < 0 ) {
+          rec.Bunches = 0
         }
 
-        // Only need to refresh line if a variety is selected
-        if (this.orderDetails[i].SKU.length > 0) {
+        // Extend the price
+        let extended = Number(rec["Price per Bunch"]) * Number(rec.Bunches)
 
-          let forecastRec = this.forecastMap.get(this.orderDetails[i].SKU)
+        rec.Extended = Number(extended).toFixed(2)
+        
+        orderTotal = orderTotal + extended
 
-          this.orderDetails[i].Crop = forecastRec.Crop
-          this.orderDetails[i].Variety = forecastRec.Variety
-          this.orderDetails[i].Color = forecastRec.Color
-          this.orderDetails[i]["Price per Bunch"] = forecastRec["Price per Bunch"]
-          
-          // Extend the price
-          let extended = Number(this.orderDetails[i]["Price per Bunch"]) * Number(this.orderDetails[i].Bunches)
-
-          this.orderDetails[i].Extended = Number(extended).toFixed(2)
-          console.log(extended);
-          orderTotal = orderTotal + extended
-        }
-      }
+      })
 
       this.orderTotal = Number(orderTotal).toFixed(2)
-
-
     },
     //
     // Save order to AirTable
@@ -837,6 +818,10 @@ p{
 
 .fa-chevron-up {
   color: gray;
+}
+
+.hide-item {
+  display: none;
 }
 
 </style>
