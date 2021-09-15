@@ -60,13 +60,6 @@
 
       <br />
       <h3 id="order-detail-header">Order Detail</h3>
-      <div>
-        <span class="lead"> Total: ${{runningTotal}}</span>
-      </div>
-
-            
-
-
         
       <hr>
       <!-- prototype order detail layout -->
@@ -126,25 +119,31 @@
           </div>
         </li>
 
-        <li id="addItemBtn" class="lineItem" v-if="!addingItem" @click="startSearch">
-          <h3 class="text-center">+</h3>
+        <li id="addItemBtn" class="lineItem p-0" v-if="!addingItem" @click="startSearch">
+          <h5 class="text-center">+</h5>
         </li>
+        <li>
+          <div class="lineItem d-flex flex-row justify-content-between align-items-center">
+            <span class="lead">Total: </span> <span class="fs-5"> <strong>${{runningTotal}}</strong></span>
+          </div>
+        </li>
+
 
 
       </ul>
 
-      <div class="form-row my-2">
-        <div class="col">
-            <p><small class="form-text text-muted">All varieties sold at 10 stems per bunch (spb) unless stated otherwise</small></p>  
-        </div>
-        <div class="col-2">
-          <p></p>
-        </div>
-      </div>
 
-      <div id="search-filter" v-if="addingItem" class="px-2 py-1">
+
+      <div id="search-filter" v-if="addingItem" class="px-2 py-2">
+        <div class="d-flex flex-row justify-content-center mb-1" >
+          <!-- <button type="button" class="close"  aria-label="Close" @click="addingItem=!addingItem">
+            <span aria-hidden="true">&times;</span>
+          </button> -->
+          <i class="fas fa-chevron-up"  @click="addingItem=!addingItem"></i>
+        </div>
+
         <!-- Color Dots/Swatches -->
-        <ul class="d-flex flex-row justify-content-between mb-1">
+        <ul class="d-flex flex-row flex-wrap justify-content-between mb-1 ">
           <li v-for="swatch in colorOptions" :key="swatch" >
             <input type="checkbox" :id="swatch" :value="swatch" class="mr-1" v-model="checkedColors">
             <label for="swatch">
@@ -183,11 +182,18 @@
           </div>
 
         </form>
-
-          <!-- reset search button -->
-          <div class="d-flex flex-row justify-content-end align-items-center my-2">
-            <button @click="addingItem=!addingItem" class="btn-primary-custom">Done</button>
+        <div class="form-row my-2">
+          <div class="col">
+              <p><small class="form-text text-muted">All varieties sold at 10 stems per bunch (spb) unless stated otherwise</small></p>  
           </div>
+          <div class="col-2">
+            <p></p>
+          </div>
+        </div>      
+          <!-- reset search button -->
+          <!-- <div class="d-flex flex-row justify-content-end align-items-center my-2">
+            <button @click="addingItem=!addingItem" class="btn-primary-custom">Done</button>
+          </div> -->
 
           <hr>
 
@@ -309,6 +315,14 @@ export default {
     // refresh line
     //
     refreshLines(){
+            this.orderDetails.forEach(rec => {
+
+        console.log(rec.Bunches);
+        // if (rec.Bunches === 0) {
+        //   console.log('out of ' + rec.Crop);
+        // }
+      })
+
       let orderTotal = 0
 
       var noLines = Number(this.orderDetails.length)
@@ -339,6 +353,8 @@ export default {
       }
 
       this.orderTotal = Number(orderTotal).toFixed(2)
+
+
     },
     //
     // Save order to AirTable
@@ -770,7 +786,9 @@ span.badge{
   border: solid 2px lightgray;
   border-radius: .25em;
 }
-
+#addItemBtn {
+  color: gray;
+}
 #addItemBtn:hover{
   cursor: pointer;
 }
@@ -815,6 +833,10 @@ p{
   right: 0;
   margin-right: 10px;
   margin-bottom: 20px;
+}
+
+.fa-chevron-up {
+  color: gray;
 }
 
 </style>
