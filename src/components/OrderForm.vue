@@ -234,25 +234,24 @@
                   <!-- 10 stems per bunch -->
                   <div v-else>
                     <!-- toprow -->
-                    <div> 
-                      <span class="lead">{{ rec.Crop }}</span> 
+                    <div class="d-flex flex-column align-items-center my-1"> 
+                      <span class="">{{ rec.Crop }}</span> 
                       <span class="font-weight-bold">{{ rec.Variety }}</span> 
                     </div>
 
                     <!-- middle row -->
-                    <div>
-                      <small class="text-muted">({{ rec["SKU #"] }})</small>, ${{rec["Price per Bunch"] }}/bu
+                    <div class="d-flex justify-content-between my-1 mx-1">
+                      <small class="text-muted">({{ rec["SKU #"] }})</small> ${{rec["Price per Bunch"] }}/bu
                     </div>
                     
                     <!-- bottom row -->
-                    <div class="d-flex justify-content-around my-1">
+                    <div class="d-flex justify-content-between my-1 mx-1">
                       <!-- <i class="color-dot fas fa-seedling" :style="{color:rec.Color}"></i> -->
-                      <span class="badge badge-pill badge-primary">{{rec.Color}}</span>
-                      <span class="badge badge-pill badge-success"> {{ rec.Category }}</span>
-                      <span class="badge badge-pill badge-secondary">{{toDollarSings(Number(rec.Tier))}}</span>
+                      <span class="badge badge-pill badge-primary" @click="clickColorBadge">{{rec.Color}}</span>
+                      <span class="badge badge-pill badge-success" @click="clickCategoryBadge"> {{ rec.Category }}</span>
+                      <span class="badge badge-pill badge-secondary" @click="clickDollarBadge">{{toDollarSings(Number(rec.Tier))}}</span>
                     </div>
                   </div>
-
                 </div>
               </li>
             </ul>
@@ -300,6 +299,35 @@ export default {
   },
 
   methods: {
+    clickCategoryBadge(event) {
+      event.stopPropagation()
+      let category = event.target.innerText 
+      this.checkedCategories.push(category)
+    },
+    clickColorBadge(event) {
+      event.stopPropagation()
+      let color = event.target.innerText 
+      this.checkedColors.push(color.toLowerCase())
+    },
+    clickDollarBadge(event) {
+      event.stopPropagation()
+      let dollars = event.target.innerText 
+      
+      switch (dollars) {
+        case "$":
+          this.priceRange = "2"
+          break;
+        case "$$":
+          this.priceRange = "4"
+          break;
+        case "$$$":
+          this.priceRange = "6"
+          break;                
+        default:
+          break;
+      }
+    },
+
 
     prevent(){
       // this is to prevent the search bar from refereshing the page by accident
