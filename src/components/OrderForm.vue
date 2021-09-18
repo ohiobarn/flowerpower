@@ -72,49 +72,67 @@
               <span class="lead">{{detail.Crop}}</span> <i class="color-dot fas fa-leaf" style="color:#F4C9C9"></i>
             </div>
             
-            <div class="middle-row my-2 d-flex flex-row justify-content-around">
+            <div class="middle-row my-2 d-flex flex-row justify-content-center">
               <span><strong> {{detail.Variety}} </strong></span> 
             </div>
             
-            <div class="label-row text-muted d-flex flex-row justify-content-between align-items-center">
-              <small class="sku">SKU</small> <small class="bunches">BUNCHES</small> <small class="extended">EXTENDED</small> 
+            <div class="d-flex flex-row justify-content-between align-items-center">
+              <div class="d-flex flex-column align-items center">
+                <p><small class="sku text-muted">SKU</small> </p>
+                <p><small class="sku">{{detail.SKU}}</small> </p>
+              </div>
+                 
+              <div class="d-flex flex-column align-items center">
+                <p><small class="bunches text-muted">BUNCHES</small> </p>
+                <p>
+                  <span class="bunches">
+                  <select name="bunches" id="bunches"  v-model="orderDetails[index].Bunches"  v-on:change="onChangeQuantity">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15">15</option>
+                    <option value="16">16</option>
+                    <option value="17">17</option>
+                    <option value="18">18</option>
+                    <option value="19">19</option>
+                    <option value="20">20</option>
+                    <option value="21">21</option>
+                    <option value="22">22</option>
+                    <option value="23">23</option>
+                    <option value="24">24</option>
+                    <option value="24">24</option>
+                  </select>
+                
+                  x ${{detail["Price per Bunch"]}}</span>
+                </p>
+              </div>
+
+              <div class="d-flex flex-column align-items center">
+                <p> 
+                  <small class="extended text-muted">EXTENDED</small>
+                </p>
+                <p>
+                  <span class="extended">${{detail.Extended}}</span> 
+                </p>
+              </div>
             </div>
             
-            <div class="bottom-row d-flex flex-row justify-content-between align-items-center">
-              <small class="sku">{{detail.SKU}}</small> 
-              <span class="bunches">
-                <select name="bunches" id="bunches"  v-model="orderDetails[index].Bunches"  v-on:change="onChangeQuantity">
-                  <option value="0">0</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                  <option value="6">6</option>
-                  <option value="7">7</option>
-                  <option value="8">8</option>
-                  <option value="9">9</option>
-                  <option value="10">10</option>
-                  <option value="11">11</option>
-                  <option value="12">12</option>
-                  <option value="13">13</option>
-                  <option value="14">14</option>
-                  <option value="15">15</option>
-                  <option value="16">16</option>
-                  <option value="17">17</option>
-                  <option value="18">18</option>
-                  <option value="19">19</option>
-                  <option value="20">20</option>
-                  <option value="21">21</option>
-                  <option value="22">22</option>
-                  <option value="23">23</option>
-                  <option value="24">24</option>
-                  <option value="24">24</option>
-                </select>
-                
-                x ${{detail["Price per Bunch"]}}</span> 
-              <span class="extended">${{detail.Extended}}</span> 
-            </div>
+            <!-- <div class="bottom-row d-flex flex-row justify-content-between align-items-center">
+              
+
+            </div> -->
           
           </div>
         </li>
@@ -203,20 +221,38 @@
               <li 
               v-for="(rec, i) in filteredForecast" 
               :key="i" 
-              class="my-1 d-flex flex-row no-wrap justify-content-between align-items-center border-bottom"
+              class="my-1 border-bottom"
               @click="addToOrder(rec)" 
               >
                 <div >
                   <div v-if='rec["Stems per Bunch"] != 10'>
-                    <p>{{ rec.Crop }}, {{ rec.Variety }} </p>
+                    <p> <span class="lead">{{ rec.Crop }}</span> <span class="font-weight-bold">{{ rec.Variety }}</span> </p>
                     <p>{{ rec.Color }}, {{ rec.Category }}</p>
                     <p><small class="text-muted">({{ rec["SKU #"] }})</small> {{rec["Price per Bunch"] }}/bu @ {{ rec["Stems per Bunch"] }} spb</p>
                   </div>
+
+                  <!-- 10 stems per bunch -->
                   <div v-else>
-                    <p>{{ rec.Crop }}, {{ rec.Variety }} </p>
-                    <p>{{ rec.Color }}, {{ rec.Category }}</p>
-                    <p><small class="text-muted">({{ rec["SKU #"] }})</small>, ${{rec["Price per Bunch"] }}/bu</p>
+                    <!-- toprow -->
+                    <div> 
+                      <span class="lead">{{ rec.Crop }}</span> 
+                      <span class="font-weight-bold">{{ rec.Variety }}</span> 
+                    </div>
+
+                    <!-- middle row -->
+                    <div>
+                      <small class="text-muted">({{ rec["SKU #"] }})</small>, ${{rec["Price per Bunch"] }}/bu
+                    </div>
+                    
+                    <!-- bottom row -->
+                    <div class="d-flex justify-content-around my-1">
+                      <!-- <i class="color-dot fas fa-seedling" :style="{color:rec.Color}"></i> -->
+                      <span class="badge badge-pill badge-primary">{{rec.Color}}</span>
+                      <span class="badge badge-pill badge-success"> {{ rec.Category }}</span>
+                      <span class="badge badge-pill badge-secondary">{{toDollarSings(Number(rec.Tier))}}</span>
+                    </div>
                   </div>
+
                 </div>
               </li>
             </ul>
@@ -231,6 +267,7 @@
             <router-link to="/order" class="btn btn-secondary">Cancel</router-link> 
           </div>        
       </div>
+
     </form>
     <div v-if="showScrollUp" id="scroll-btn" @click.prevent="scrollUp"><i class="fas fa-chevron-up"></i></div>
   </div>
@@ -628,6 +665,24 @@ export default {
         
         this.showScrollUp = false
       }
+    },
+    toDollarSings(tier){
+      switch (tier) {
+        case 1:
+          return '$';
+        case 2:
+          return '$';
+        case 3:
+          return '$$';
+        case 4:
+          return '$$';
+        case 5:
+          return '$$$';
+        case 6:
+          return '$$$';
+        default:
+          return 'NA';
+      }
     }
   },
   mounted(){
@@ -696,22 +751,7 @@ export default {
 
     },
     dollarSigns(){
-      switch (this.priceRange) {
-        case 1:
-          return '$';
-        case 2:
-          return '$';
-        case 3:
-          return '$$';
-        case 4:
-          return '$$';
-        case 5:
-          return '$$$';
-        case 6:
-          return '$$$';
-        default:
-          return 'NA';
-      }
+      return this.toDollarSings(this.priceRange)
     },
     runningTotal(){
       
@@ -753,7 +793,8 @@ export default {
 }
 
 span.badge{
-  background-color: #F4C9C9;
+  font-size: 0.7em;
+  font-weight: 400;
 }
 
 .lineItem{
@@ -786,23 +827,7 @@ ul{
   padding-left: 0;
 }
 
-small.sku {
-  width: 125px;
-  display: inline-block;
-  text-align: center;
-}
 
-.bunches{
-  width: 125px;
-  display: inline-block;
-  text-align: center;
-}
-
-.extended{
-  width: 125px;
-  display: inline-block;
-  text-align: center;
-}
 
 p{
   margin-bottom: 0;
