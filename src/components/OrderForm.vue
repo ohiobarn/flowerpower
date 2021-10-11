@@ -62,19 +62,12 @@
           <h3 id="order-detail-header">Varieties</h3>
 
           <hr />
+
           <!-- prototype order detail layout -->
           <ul class="pl-0">
             <li v-for="(detail, index) in orderDetails" :key="index" :class="{ 'hide-item': Number(detail.Bunches) === 0 }">
               <div class="lineItem">
-                <div
-                  class="
-                    top-row
-                    d-flex
-                    flex-row
-                    justify-content-between
-                    align-items-start
-                  "
-                >
+                <div class="top-row d-flex flex-row justify-content-between align-items-start">
                   <span class="lead">{{ detail.Crop }}</span>
                   <i class="color-dot fas fa-leaf" style="color: #f4c9c9"></i>
                 </div>
@@ -85,14 +78,7 @@
                   >
                 </div>
 
-                <div
-                  class="
-                    d-flex
-                    flex-row
-                    justify-content-between
-                    align-items-center
-                  "
-                >
+                <div class="d-flex flex-row justify-content-between align-items-center">
                   <div class="d-flex flex-column align-items center">
                     <p><small class="sku text-muted">SKU</small></p>
                     <p>
@@ -101,7 +87,7 @@
                   </div>
 
                   <div class="d-flex flex-column align-items center">
-                    <p><small class="bunches text-muted">BUNCHES</small></p>
+                    <p><small class="bunches text-muted">BUNCHES ({{ detail["Stems per Bunch"] }}/spb)</small></p>
                     <p>
                       <span class="bunches">
                         <select name="bunches" id="bunches" v-model="orderDetails[index].Bunches" v-on:change="onChangeQuantity">
@@ -252,7 +238,6 @@
 
                     <!-- bottom row -->
                     <div class="d-flex justify-content-between my-1 mx-1">
-                      <!-- <small class="text-muted">({{ rec["SKU #"] }})</small> ${{rec["Price per Bunch"] }}/bu -->
                       <small class="text-muted">({{ rec["SKU #"] }}) {{ rec["Price per Bunch"] }}/bu @ {{ rec["Stems per Bunch"] }} spb</small>
                     </div>
                   </div>
