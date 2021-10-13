@@ -135,10 +135,6 @@
                 </div>
               </div>
             </li>
-
-            <li id="addItemBtn" class="lineItem p-0" v-if="!addingItem" @click="startSearch">
-              <p class="text-center">+ Add Variety</p>
-            </li>
           </ul>
 
           <!--
@@ -146,11 +142,28 @@
             Search
 
           -->
-          <div id="search-filter" v-if="addingItem" class="px-2 py-2 bg-light">
-            <div class="d-flex flex-row justify-content-center mb-1">
-              <i class="fas fa-chevron-up" @click="addingItem = !addingItem"> close search</i>
-            </div>
+<center>
+  <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exampleModal" @click="startSearch">
+    Add Variety 
+  </button>
+</center>
 
+<hr>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="exampleModalLabel">Add Variety</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <p>Select a variety from the list below. Specify filters to pare down this list</p>
+          <div id="search-filter" class="px-2 py-2">
+            <h5>Filters:</h5>
             <!-- Color Dots/Swatches -->
             <ul class="d-flex flex-row flex-wrap justify-content-between mb-1">
               <li v-for="swatch in colorOptions" :key="swatch">
@@ -193,16 +206,6 @@
                 </select>
               </div>
             </form>
-            <div class="form-row my-2">
-              <div class="col">
-                <p>
-                  Enter serach criteria, then select a variety from your search results below
-                </p>
-              </div>
-              <div class="col-2">
-                <p></p>
-              </div>
-            </div>
 
             <hr />
 
@@ -248,6 +251,13 @@
               </ul>
             </div>
           </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
 
           <div class="form-row my-2">
             <div class="col d-flex flex-row justify-content-center">
@@ -256,7 +266,7 @@
               </button>
             </div>
             <div class="col d-flex flex-row justify-content-center">
-              <router-link to="/order" class="btn btn-secondary">Ciscard Changes</router-link>
+              <router-link to="/order" class="btn btn-warning">Discard Changes</router-link>
             </div>
           </div>
         </form>
@@ -301,7 +311,6 @@ export default {
       priceRange: null,
       checkedCategories: [],
       checkedColors: [],
-      addingItem: false,
       scrollToPoint: null,
       showScrollUp: false,
     };
@@ -343,11 +352,8 @@ export default {
     },
 
     startSearch() {
-      this.addingItem = true;
-
       const getScrollPoint = () => {
         let searchFilter = document.getElementById("search-filter");
-
         this.scrollToPoint = searchFilter.offsetTop - 190;
       };
 
@@ -361,10 +367,8 @@ export default {
     },
 
     addToOrder(rec) {
-      //DEVTODO remove this once items in orderDetials are already filtered from the search results
       if (this.orderDetails.some((order) => order.SKU === rec.SKU)) {
         // This item is already part of your order, so do nothing an go back
-        this.addingItem = false;
         this.resetSearch();
       } else {
         rec.Bunches = 1;
@@ -372,9 +376,6 @@ export default {
         rec.isNew = true;
 
         this.orderDetails.push(rec);
-
-        this.addingItem = false;
-
         this.resetSearch();
       }
     },
