@@ -1,8 +1,6 @@
 <template>
   <div id="most-outter">
     <br>
-    <h3>Order Manager</h3>
-    <br>
     <button type="button" class="btn btn-primary" v-on:click="createOrder" >Create Order</button>
     <br>&nbsp;
     <OrderList :orders="orders" />
