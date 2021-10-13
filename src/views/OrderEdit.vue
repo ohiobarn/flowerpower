@@ -1,6 +1,5 @@
 <template>
   <div id="most-outter">
-    <br />
     <OrderForm  :RecID="RecID" />
   </div>
 </template>
