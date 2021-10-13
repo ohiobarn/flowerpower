@@ -9,7 +9,7 @@
             <div class="col">
               <div class="form-group">
                 <label for="ClientJobName">Client/Job Name</label>
-                <input type="text" v-model="order['Client/Job']" class="form-control" id="ClientJobName" placeholder="The Johnson Wedding" />
+                <input type="text" v-model="order['Client/Job']" class="form-control" id="ClientJobName" placeholder="For example, The Johnson Wedding" />
               </div>
             </div>
           </div>
@@ -18,7 +18,7 @@
             <div class="col">
               <div class="form-group">
                 <label for="TeamMemberName">Team Member Name</label>
-                <input type="text" v-model="order['Team Member']" class="form-control" id="TeamMemberName" placeholder="Karen" />
+                <input type="text" v-model="order['Team Member']" class="form-control" id="TeamMemberName" placeholder="For example, Karen" />
               </div>
             </div>
           </div>
@@ -146,7 +146,7 @@
             Search
 
           -->
-          <div id="search-filter" v-if="addingItem" class="px-2 py-2">
+          <div id="search-filter" v-if="addingItem" class="px-2 py-2 bg-light">
             <div class="d-flex flex-row justify-content-center mb-1">
               <i class="fas fa-chevron-up" @click="addingItem = !addingItem"> close search</i>
             </div>
@@ -164,6 +164,10 @@
             <!-- checkbox for select by category -->
             <div class="d-flex flex-row justify-content-between">
               <div>
+                <input type="checkbox" id="dried" value="Dried" class="mr-1" v-model="checkedCategories" />
+                <label for="dried">Dried</label>
+              </div>
+              <div>
                 <input type="checkbox" id="flower" value="Flower" class="mr-1" v-model="checkedCategories" />
                 <label for="flower">Flower</label>
               </div>
@@ -175,7 +179,6 @@
                 <input type="checkbox" id="foliage" value="Foliage" class="mr-1" v-model="checkedCategories" />
                 <label for="flower">Foliage</label>
               </div>
-              <!-- DEVTODO add dried flowers       -->
             </div>
 
             <form class="search d-flex flex-row align-items-center" @submit.prevent="prevent()">
@@ -249,11 +252,11 @@
           <div class="form-row my-2">
             <div class="col d-flex flex-row justify-content-center">
               <button type="button" class="btn-primary-custom" v-on:click="saveOrder">
-                Save
+                Save Changes
               </button>
             </div>
             <div class="col d-flex flex-row justify-content-center">
-              <router-link to="/order" class="btn btn-secondary">Cancel</router-link>
+              <router-link to="/order" class="btn btn-secondary">Ciscard Changes</router-link>
             </div>
           </div>
         </form>
