@@ -1,6 +1,6 @@
 <template>
   <div class="container-fluid p-3">
-    <div class="row">
+    <div class="row justify-content-center">
       <div class="col-lg-6 p-0 d-flex flex-column align-items-start">
         <h3>Order No. {{ order.OrderNo }}</h3>
         <form>
@@ -212,7 +212,7 @@
             <!-- Search Results -->
             <div>
               <ul>
-                <li v-for="(rec, i) in filteredForecast" :key="i" class="border border-secondary rounded" @click="addToOrder(rec)">
+                <li v-for="(rec, i) in filteredForecast" :key="i" class="border border-secondary rounded my-2 px-1" :class="{'selected-li':true}" @click="addToOrder(rec)" >
                   <div>
                     <!-- toprow -->
                     <div class="d-flex flex-column align-items-start my-1">
@@ -801,10 +801,6 @@ span.badge {
   padding: 0.5em 0.5em;
 }
 
-#search-filter {
-  border: solid 2px lightgray;
-  border-radius: 0.25em;
-}
 #addItemBtn {
   color: gray;
 }
@@ -842,5 +838,9 @@ p {
 
 .hide-item {
   display: none;
+}
+
+.selected-li{
+  background-color: red;
 }
 </style>
